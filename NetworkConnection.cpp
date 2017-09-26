@@ -3,25 +3,25 @@
 
 // protected
 bool NetworkConnection::setupServer(const int &port) {
-	struct sockaddr_in serv_addr; // TODO 
-	bzero((char *) &serv_addr, sizeof(struct sockaddr_in));
-	serv_addr.sin_family = AF_INET;
-	serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-	serv_addr.sin_port = htons(port);
-	mSocket = socket(serv_addr.sin_family, connectionType, 0);
+	bzero((char *) &connAddr, sizeof(struct sockaddr_in));
+	connAddr.sin_family = AF_INET;
+	connAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+	connAddr.sin_port = htons(port);
+	mSocket = socket(connAddr.sin_family, connectionType, 0);
 	if (mSocket < 0) {
 		fprintf(stderr, "ERROR opening socket: %d\n", errno);
 		return false;
 	}
-	if (bind(mSocket, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) {
+	if (bind(mSocket, (struct sockaddr *) &connAddr, sizeof(connAddr)) < 0) {
 		fprintf(stderr, "ERROR on binding to port %d. Is it already taken?", port);
 		return false;
-	}
+	} 
 	if(connectionType == SOCK_STREAM) {
 		return waitForClientConnection();
 	} else {
 		// UDP connection
 		connected = true;
+		printf("Successfully setup socket server.\n")
 		return true;
 	}
 }
@@ -83,7 +83,9 @@ int NetworkConnection::getData(char *buff, const int &buffSize) {
 		if(clientSocket > 0) {
 			return recv(clientSocket, buff, buffSize, 0);
 		} else {
-			return recv(mSocket, buff, buffSize, 0);
+			// TODO size arg of connAddr 
+			socklen_t len = sizeof(connAddr);
+			return recvfrom(mSocket, buff, buffSize, 0, (struct sockaddr *)&connAddr, &len);
 		}
 	}
 	return -1;
