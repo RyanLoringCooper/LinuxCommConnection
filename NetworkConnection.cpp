@@ -21,7 +21,7 @@ bool NetworkConnection::setupServer(const int &port) {
 	} else {
 		// UDP connection
 		connected = true;
-		printf("Successfully setup socket server.\n")
+		printf("Successfully setup socket server.\n");
 		return true;
 	}
 }
