@@ -4,10 +4,11 @@
 // protected
 bool NetworkConnection::setupServer(const int &port) {
 	struct sockaddr_in serv_addr; // TODO 
-	bzero((char *) &serv_addr, sizeof(serv_addr));
+	bzero((char *) &serv_addr, sizeof(struct sockaddr_in));
 	serv_addr.sin_family = AF_INET;
 	serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 	serv_addr.sin_port = htons(port);
+	printf("%d == %d\n", connectionType, SOCK_DGRAM);
 	mSocket = socket(serv_addr.sin_family, connectionType, 0);
 	if (mSocket < 0) {
 		fprintf(stderr, "ERROR opening socket: %d\n", errno);
@@ -103,6 +104,7 @@ void NetworkConnection::failedRead() {
 
 // public 
 NetworkConnection::NetworkConnection(const int &port, const int &connectionType, const char *ipaddr) : CommConnection() {
+	this->connectionType = connectionType;
 	if(ipaddr == 0) {
 		if(!setupServer(port)) {
 			fprintf(stderr, "Could not setup socket server on port %d.\n", port);

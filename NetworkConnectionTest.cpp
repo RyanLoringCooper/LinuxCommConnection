@@ -6,6 +6,7 @@
 #include "NetworkConnection.h"
 
 #define BUFF_SIZE 256
+#define PORT 12345
 
 void runTest(const int &connectionType) {
 	if(fork() == 0) {
@@ -14,7 +15,7 @@ void runTest(const int &connectionType) {
 			// child code
 			char recvBuff[BUFF_SIZE];
 			memset(&recvBuff[0], 0, BUFF_SIZE);
-			NetworkConnection server = NetworkConnection(12345, connectionType);
+			NetworkConnection server = NetworkConnection(PORT, connectionType);
 			server.begin();
 			for(int i = 0; i < 3; i++) {
 				while(!server.available());
@@ -28,7 +29,7 @@ void runTest(const int &connectionType) {
 			// parent code
 			char recvBuff[BUFF_SIZE];
 			memset(&recvBuff[0], 0, BUFF_SIZE);
-			NetworkConnection client = NetworkConnection(12345, connectionType, "127.0.0.1");
+			NetworkConnection client = NetworkConnection(PORT, connectionType, "127.0.0.1");
 			client.begin();
 			for(int i = 0; i < 3; i++) {
 				client.write("Hello", 6);
