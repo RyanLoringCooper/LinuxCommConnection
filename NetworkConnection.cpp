@@ -8,7 +8,6 @@ bool NetworkConnection::setupServer(const int &port) {
 	serv_addr.sin_family = AF_INET;
 	serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 	serv_addr.sin_port = htons(port);
-	printf("%d == %d\n", connectionType, SOCK_DGRAM);
 	mSocket = socket(serv_addr.sin_family, connectionType, 0);
 	if (mSocket < 0) {
 		fprintf(stderr, "ERROR opening socket: %d\n", errno);
