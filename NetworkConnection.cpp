@@ -9,10 +9,14 @@ bool NetworkConnection::setupServer(const int &port) {
 	serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 	serv_addr.sin_port = htons(port);
 	mSocket = socket(serv_addr.sin_family, connectionType, 0);
-	if (mSocket < 0) 
-		fprintf(stderr, "ERROR opening socket");
-	if (bind(mSocket, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) 
+	if (mSocket < 0) {
+		fprintf(stderr, "ERROR opening socket: %d\n", errno);
+		return false;
+	}
+	if (bind(mSocket, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) {
 		fprintf(stderr, "ERROR on binding to port %d. Is it already taken?", port);
+		return false;
+	}
 	if(connectionType == SOCK_STREAM) {
 		return waitForClientConnection();
 	} else {
