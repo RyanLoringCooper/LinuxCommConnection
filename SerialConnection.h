@@ -3,6 +3,7 @@
 #define SERIALCONNECTION_H
 
 #include <termios.h>
+#include <fcntl.h>
 #include <unistd.h>
 #include <errno.h>
 #include <cstdio>
@@ -15,6 +16,8 @@ protected:
 	void failedRead();
 	int getData(char *buff, const int &buffSize);
 	void exitGracefully();
+	int set_interface_attribs (const int &speed, const int &parity); 
+	int set_blocking (const bool &should_block);
 public:
 	SerialConnection();
 	SerialConnection(char *portName);

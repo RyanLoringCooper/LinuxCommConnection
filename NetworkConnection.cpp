@@ -13,7 +13,7 @@ bool NetworkConnection::setupServer(const int &port) {
 		return false;
 	}
 	if (bind(mSocket, (struct sockaddr *) &connAddr, sizeof(connAddr)) < 0) {
-		fprintf(stderr, "ERROR on binding to port %d. Is it already taken?", port);
+		fprintf(stderr, "ERROR on binding to port %d. Is it already taken?\n", port);
 		return false;
 	} 
 	if(connectionType == SOCK_STREAM) {
