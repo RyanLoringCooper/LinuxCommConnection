@@ -29,6 +29,14 @@ void CommConnection::fillBuffer(char *buff, const int &bytesRead) {
 	}
 }
 
+void CommConnection::closeThread() {
+	interruptRead = true;
+	if(readThread != NULL && readThread->joinable()) {
+		readThread->join();
+		delete readThread;
+	}
+}
+
 CommConnection::CommConnection() {
 	connected = false;
 	interruptRead = false;
@@ -39,7 +47,7 @@ CommConnection::CommConnection() {
 }
 
 CommConnection::~CommConnection() {
-	terminate();	
+	closeThread();	
 }
 
 bool CommConnection::begin() {
@@ -116,11 +124,7 @@ void CommConnection::clearBuffer() {
 }
 
 void CommConnection::terminate() {
-	interruptRead = true;
-	if(readThread != NULL && readThread->joinable()) {
-		readThread->join();
-		delete readThread;
-	}
-	delete[] buffer;
+	closeThread();
+	//delete[] buffer;
 	exitGracefully();
 }

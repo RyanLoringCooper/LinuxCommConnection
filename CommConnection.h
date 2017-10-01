@@ -17,6 +17,7 @@ protected:
 
 	void performReads();
 	void fillBuffer(char *buff, const int &bytesRead);
+	void closeThread();
 
 	virtual void failedRead() = 0;
 	virtual int getData(char *buff, const int &buffSize) = 0;
