@@ -3,9 +3,6 @@
 #define NETWORKCONNECTION_H
 #undef UNICODE
 
-#include <cstdlib>
-#include <cstdio>
-
 #if defined(__linux__) || defined(__linux) || defined(linux) 
 
 #include <unistd.h>
@@ -28,6 +25,8 @@
 #error Unsupported os
 #endif
 
+#include <cstdlib>
+#include <cstdio>
 #include "CommConnection.h"
 
 class NetworkConnection : public CommConnection {
