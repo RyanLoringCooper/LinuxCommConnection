@@ -36,7 +36,6 @@ protected:
 	int getData(char *buff, const int &buffSize);
 	void exitGracefully();
 public:
-	SerialConnection();
 	SerialConnection(char *portName);
 	~SerialConnection();
 	bool write(char *buff, const int &buffSize);
