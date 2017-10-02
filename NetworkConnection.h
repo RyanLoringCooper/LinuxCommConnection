@@ -5,20 +5,42 @@
 
 #include <cstdlib>
 #include <cstdio>
-#include <chrono>
-#include <mutex>
-#include <condition_variable>
+
+#if defined(__linux__) || defined(__linux) || defined(linux) 
+
 #include <unistd.h>
 #include <sys/types.h> 
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h> 
+
+#elif defined(_WIN32)
+
+#define WIN32_LEAN_AND_MEAN
+
+#include <windows.h>
+#include <winsock2.h>
+#include <ws2tcpip.h>
+// Need to link with Ws2_32.lib
+#pragma comment (lib, "Ws2_32.lib")
+
+#else
+#error Unsupported os
+#endif
+
 #include "CommConnection.h"
 
 class NetworkConnection : public CommConnection {
 protected:
-	int mSocket, clientSocket, connectionType;
+#if defined(__linux__) || defined(__linux) || defined(linux) 
+	int mSocket, clientSocket;
 	struct sockaddr_in connAddr;
+#elif defined(_WIN32)
+	SOCKET listenSocket, clientSocket;
+#else
+#error Unsupported os
+#endif
+	int connectionType;
 
 	bool setupServer(const int &port);
 	bool setupClient(const char *ipaddr, const int &port);
