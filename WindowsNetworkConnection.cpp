@@ -6,7 +6,7 @@ bool NetworkConnection::setupServer(const int &port) {
     struct addrinfo *result = NULL, *ptr = NULL, hints;
     ZeroMemory(&hints, sizeof (hints));
     hints.ai_family = AF_INET;
-    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_socktype = connectionType;
     hints.ai_protocol = IPPROTO_TCP;
     hints.ai_flags = AI_PASSIVE;
     // Initialize Winsock
@@ -56,7 +56,7 @@ bool NetworkConnection::setupClient(const char *ipaddr, const int &port) {
     // TODO handle as client
 }
 
-bool NetworkConnection::connectToServer() {
+bool NetworkConnection::connectToServer() { // TODO
     connected = true;
     return true;
 }
@@ -112,24 +112,6 @@ void NetworkConnection::failedRead() {
 }
 
 // public 
-NetworkConnection::NetworkConnection(const int &port, const int &connectionType, const char *ipaddr) : CommConnection() {
-	this->connectionType = connectionType;
-	if(ipaddr == 0) {
-		if(!setupServer(port)) {
-			fprintf(stderr, "Could not setup socket server on port %d.\n", port);
-		}
-	} else {
-		clientSocket = 0;
-		if(!setupClient(ipaddr, port)) {
-			fprintf(stderr, "Could not setup socket client connection to %s:%d", ipaddr, port);
-		}
-	}
-}
-
-NetworkConnection::~NetworkConnection() {
-	exitGracefully();
-}
-
 bool NetworkConnection::write(char *buff, const int &buffSize) { // TODO handle as client
 	if(!connected) 
 		return false;

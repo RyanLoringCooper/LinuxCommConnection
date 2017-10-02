@@ -83,7 +83,6 @@ int NetworkConnection::getData(char *buff, const int &buffSize) {
 		if(clientSocket > 0) {
 			return recv(clientSocket, buff, buffSize, 0);
 		} else {
-			// TODO size arg of connAddr 
 			socklen_t len = sizeof(connAddr);
 			return recvfrom(mSocket, buff, buffSize, 0, (struct sockaddr *)&connAddr, &len);
 		}
@@ -104,24 +103,6 @@ void NetworkConnection::failedRead() {
 }
 
 // public 
-NetworkConnection::NetworkConnection(const int &port, const int &connectionType, const char *ipaddr) : CommConnection() {
-	this->connectionType = connectionType;
-	if(ipaddr == 0) {
-		if(!setupServer(port)) {
-			fprintf(stderr, "Could not setup socket server on port %d.\n", port);
-		}
-	} else {
-		clientSocket = 0;
-		if(!setupClient(ipaddr, port)) {
-			fprintf(stderr, "Could not setup socket client connection to %s:%d", ipaddr, port);
-		}
-	}
-}
-
-NetworkConnection::~NetworkConnection() {
-	exitGracefully();
-}
-
 bool NetworkConnection::write(char *buff, const int &buffSize) {
 	if(!connected) 
 		return false;
