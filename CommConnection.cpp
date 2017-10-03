@@ -2,18 +2,16 @@
 #include <cstdio>
 
 void CommConnection::performReads() {
-	if(!noReads) {
-		char buff[MAX_DATA_LENGTH];
-		memset(buff, 0, MAX_DATA_LENGTH);
-		int bytesRead;
-		while(!interruptRead) {
-			bytesRead = getData(buff, MAX_DATA_LENGTH);
-	 	    if (bytesRead > 0) {
-		        fillBuffer(buff, bytesRead);
-		    } else if(bytesRead < 0) {
-				failedRead();
-		    }	
-		}
+	char buff[MAX_DATA_LENGTH];
+	memset(buff, 0, MAX_DATA_LENGTH);
+	int bytesRead;
+	while(!interruptRead) {
+		bytesRead = getData(buff, MAX_DATA_LENGTH);
+ 	    if (bytesRead > 0) {
+	        fillBuffer(buff, bytesRead);
+	    } else if(bytesRead < 0) {
+			failedRead();
+		}	
 	}
 }
 
@@ -55,7 +53,9 @@ CommConnection::~CommConnection() {
 
 bool CommConnection::begin() {
 	if(connected) {
-		readThread = new std::thread(&CommConnection::performReads, this);
+		if(!noReads) {
+			readThread = new std::thread(&CommConnection::performReads, this);
+		}
 		return true;
 	} else {
 		return false;
