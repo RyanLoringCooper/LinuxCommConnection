@@ -42,7 +42,7 @@ void SerialPort::exitGracefully() {
 
 // public:
 
-SerialPort::SerialPort(char *portName) : CommConnection() {
+SerialPort::SerialPort(char *portName, const bool &noReads) : CommConnection(noReads) {
     handler = CreateFileA(static_cast<LPCSTR>(portName),
         GENERIC_READ | GENERIC_WRITE,
         0,

@@ -6,9 +6,9 @@
 #error Unsupported os
 #endif
 
-NetworkConnection::NetworkConnection(const int &port, const int &connectionType, const char *ipaddr) : CommConnection() {
+NetworkConnection::NetworkConnection(const int &port, const int &connectionType, const char *ipaddr, const bool &noReads) : CommConnection(noReads) {
 	this->connectionType = connectionType;
-	if(ipaddr == 0) {
+	if(strcmp(ipaddr, "") == 0) {
 		if(!setupServer(port)) {
 			fprintf(stderr, "Could not setup socket server on port %d.\n", port);
 		}

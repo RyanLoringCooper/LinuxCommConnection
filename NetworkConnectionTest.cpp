@@ -3,6 +3,8 @@
 #include <sys/types.h> 
 #include <sys/socket.h>
 #include <sys/wait.h>
+#include <thread>
+#include <chrono>
 #include "NetworkConnection.h"
 
 #define BUFF_SIZE 256
@@ -31,6 +33,7 @@ void runTest(const int &connectionType) {
 			memset(&recvBuff[0], 0, BUFF_SIZE);
 			NetworkConnection client = NetworkConnection(PORT, connectionType, "127.0.0.1");
 			client.begin();
+            std::this_thread::sleep_for(std::chrono::seconds(5));
 			for(int i = 0; i < 3; i++) {
 				client.write("Hello", 6);
 				while(!client.available());

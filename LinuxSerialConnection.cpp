@@ -83,7 +83,7 @@ SerialConnection::SerialConnection() : CommConnection() {
 
 // speed should have a B in front of it (ie. B57600)
 // I recommend parity 0
-SerialConnection::SerialConnection(char *portName, const int &speed, const int &parity) : CommConnection() {
+SerialConnection::SerialConnection(char *portName, const int &speed, const int &parity, const bool &noReads) : CommConnection(noReads) {
 	connected = false;
 	ser = open (portname, O_RDWR | O_NOCTTY | O_SYNC);
 	if (ser < 0) {

@@ -12,7 +12,7 @@ class CommConnection {
 protected:
 	char *buffer;
 	int readIndex, writeIndex;
-	volatile bool connected, interruptRead;
+	volatile bool connected, interruptRead, noReads;
 	std::thread *readThread;
 
 	void performReads();
@@ -23,7 +23,7 @@ protected:
 	virtual int getData(char *buff, const int &buffSize) = 0;
 	virtual void exitGracefully() = 0;
 public:
-	CommConnection();
+	CommConnection(const bool &noReads = false);
 	~CommConnection();
 
 	bool begin();
