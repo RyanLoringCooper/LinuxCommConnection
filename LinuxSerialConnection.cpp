@@ -105,7 +105,7 @@ SerialConnection::~SerialConnection() {
 	exitGracefully();	
 }
 
-bool SerialConnection::write(char *buff, const int &buffSize) {
+bool SerialConnection::write(const char *buff, const int &buffSize) {
 	if(!connected) 
 		return false;
 	return (bool) write(ser, buff, buffSize);

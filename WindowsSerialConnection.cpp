@@ -83,7 +83,7 @@ SerialPort::~SerialPort() {
     exitGracefully();   
 }
 
-bool SerialPort::write(char *buff, const int &buffSize) {
+bool SerialPort::write(const char *buff, const int &buffSize) {
     if(!connected) 
         return false;
     DWORD bytesSend, errors;

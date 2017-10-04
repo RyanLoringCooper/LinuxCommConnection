@@ -38,7 +38,7 @@ protected:
 public:
 	SerialConnection(char *portName, const bool &noReads);
 	~SerialConnection();
-	bool write(char *buff, const int &buffSize);
+	bool write(const char *buff, const int &buffSize);
 };
 
 #endif // SERIALPORT_H

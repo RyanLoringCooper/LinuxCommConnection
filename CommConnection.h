@@ -35,7 +35,7 @@ public:
 	void clearBuffer();	
 	void terminate();
 
-	virtual bool write(char *buff, const int &bufSize) = 0;
+	virtual bool write(const char *buff, const int &bufSize) = 0;
 };
 
 #endif //COMMCONNECTION_H
