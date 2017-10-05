@@ -105,7 +105,7 @@ bool NetworkConnection::waitForClientConnection() {
         WSACleanup();
         return false;
     }
-    printf("Waiting for controller client connection...\n");
+    printf("Waiting for client connection...\n");
     // accept a client socket
     clientSocket = accept(mSocket, NULL, NULL);
     if (clientSocket == INVALID_SOCKET) {

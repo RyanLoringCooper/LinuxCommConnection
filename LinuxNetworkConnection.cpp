@@ -55,7 +55,7 @@ bool NetworkConnection::waitForClientConnection() {
 	bzero((char *) &connAddr, sizeof(connAddr));
 	socklen_t connLen = sizeof(connAddr);
 	listen(mSocket,5);
-	printf("Waiting for controller client connection...\n");
+	printf("Waiting for client connection...\n");
 	// accept a client socket
 	clientSocket = accept(mSocket, (struct sockaddr *) &connAddr, &connLen);
 	if (clientSocket < 0) {
