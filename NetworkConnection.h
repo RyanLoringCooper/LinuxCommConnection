@@ -57,7 +57,7 @@ public:
 	NetworkConnection(const NetworkConnection &other);
 	~NetworkConnection();
 	
-	bool write(char *buff, const int &buffSize);
+	bool write(const char *buff, const int &buffSize);
 };
 
 #endif 

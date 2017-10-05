@@ -6,35 +6,6 @@
 #error Unsupported os
 #endif
 
-NetworkConnection::NetworkConnection() : CommConnection() {}
-
-NetworkConnection::NetworkConnection(const NetworkConnection &other) {
-	if(this == *other) {
-		return;
-	}
-	*this = other;
-}
-
-NetworkConnection NetworkConnection::operator=(const NetworkConnection &other) {
-    if(this == *other) {
-        return this;
-    }
-    memcpy(buffer, other.buffer, BUFFER_SIZE);
-    readIndex = other.readIndex;
-    writeIndex = other.writeIndex;
-    connected = other.connected;
-    interruptRead = other.interruptRead;
-    noReads = other.noReads;
-    begun = other.begun;
-    mSocket = other.mSocket;
-    clientSocket = other.clientSocket;
-    connAddr = other.connAddr;
-    if(begun) {
-        begin();
-    }
-    return *this;
-}
-
 NetworkConnection::NetworkConnection(const int &port, const int &connectionType, const char *ipaddr, const bool &noReads) : CommConnection(noReads) {
 	this->connectionType = connectionType;
 	if(strcmp(ipaddr, "") == 0) {

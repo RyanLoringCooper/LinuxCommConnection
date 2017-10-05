@@ -103,7 +103,7 @@ void NetworkConnection::failedRead() {
 }
 
 // public 
-bool NetworkConnection::write(char *buff, const int &buffSize) {
+bool NetworkConnection::write(const char *buff, const int &buffSize) {
 	if(!connected) 
 		return false;
 	if(clientSocket > 0) {
