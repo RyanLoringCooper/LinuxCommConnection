@@ -5,3 +5,5 @@
 #else
 #error Unsupported os
 #endif
+
+SerialConnection::SerialConnection() : CommConnection() {}

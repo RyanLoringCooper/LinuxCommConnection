@@ -6,6 +6,8 @@
 #error Unsupported os
 #endif
 
+NetworkConnection::NetworkConnection() : CommConnection() { }
+
 NetworkConnection::NetworkConnection(const int &port, const int &connectionType, const char *ipaddr, const bool &noReads) : CommConnection(noReads) {
 	this->connectionType = connectionType;
 	if(strcmp(ipaddr, "") == 0) {
