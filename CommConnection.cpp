@@ -53,6 +53,7 @@ CommConnection::~CommConnection() {
 
 bool CommConnection::begin() {
 	if(connected) {
+		begun = true;
 		if(!noReads) {
 			readThread = new std::thread(&CommConnection::performReads, this);
 		}

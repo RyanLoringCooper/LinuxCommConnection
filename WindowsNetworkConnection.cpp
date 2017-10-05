@@ -3,7 +3,7 @@
 // protected
 bool NetworkConnection::setupServer(const int &port) {
     WSADATA wsaData;
-    result = NULL;
+    connAddr = NULL;
     struct addrinfo *ptr = NULL, hints;
     ZeroMemory(&hints, sizeof (hints));
     hints.ai_family = AF_INET;
@@ -21,33 +21,33 @@ bool NetworkConnection::setupServer(const int &port) {
         return false;
     }
     // Resolve the local address and port to be used by the server
-    iResult = getaddrinfo(NULL, itoa(port), &hints, &result);
+    iResult = getaddrinfo(NULL, itoa(port), &hints, &connAddr);
     if (iResult != 0) {
         printf("getaddrinfo failed: %d\n", iResult);
         WSACleanup();
         return false;
     }
     // setup socket
-    mSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
+    mSocket = socket(connAddr->ai_family, connAddr->ai_socktype, connAddr->ai_protocol);
     if (mSocket == INVALID_SOCKET) {
         printf("Error at socket(): %ld\n", WSAGetLastError());
-        freeaddrinfo(result);
+        freeaddrinfo(connAddr);
         freeaddrinfo(ptr);
         WSACleanup();
         return false;
     }   
     // Setup the TCP listening socket
-    iResult = bind(mSocket, result->ai_addr, (int)result->ai_addrlen);
+    iResult = bind(mSocket, connAddr->ai_addr, (int)connAddr->ai_addrlen);
     if (iResult == SOCKET_ERROR) {
         printf("bind failed with error: %d\n", WSAGetLastError());
-        freeaddrinfo(result);
+        freeaddrinfo(connAddr);
         freeaddrinfo(ptr);
         closesocket(mSocket);
         WSACleanup();
         return false;
     }
     // frees up memory related to connection information
-    freeaddrinfo(result);
+    freeaddrinfo(connAddr);
     freeaddrinfo(ptr);
     return waitForClientConnection();
 }
@@ -71,13 +71,13 @@ bool NetworkConnection::setupClient(const char *ipaddr, const int &port) {
     }
 
     // Resolve the server address and port
-    iResult = getaddrinfo(ipaddr, itoa(port), &hints, &result);
+    iResult = getaddrinfo(ipaddr, itoa(port), &hints, &connAddr);
     if ( iResult != 0 ) {
         fprintf(stderr, "getaddrinfo failed with error: %d\n", iResult);
         WSACleanup();
         return false;
     }
-    mSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
+    mSocket = socket(connAddr->ai_family, connAddr->ai_socktype, connAddr->ai_protocol);
     if (mSocket == INVALID_SOCKET) {
         fprintf(stderr, "socket failed with error: %ld\n", WSAGetLastError());
         WSACleanup();
@@ -87,7 +87,7 @@ bool NetworkConnection::setupClient(const char *ipaddr, const int &port) {
 }
 
 bool NetworkConnection::connectToServer() { 
-    iResult = connect(mSocket, result->ai_addr, (int)result->ai_addrlen);
+    iResult = connect(mSocket, connAddr->ai_addr, (int)connAddr->ai_addrlen);
     if (iResult == SOCKET_ERROR) {
         closesocket(mSocket);
         mSocket = INVALID_SOCKET;
@@ -168,4 +168,8 @@ bool NetworkConnection::write(const char *buff, const int &buffSize) {
         return false;
     }
     return true;
+}
+
+NetworkConnection::NetworkConnection() : CommConnection() {
+    printf("Default constructor called\n");
 }

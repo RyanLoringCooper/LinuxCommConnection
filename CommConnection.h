@@ -12,7 +12,8 @@ class CommConnection {
 protected:
 	char *buffer;
 	int readIndex, writeIndex;
-	volatile bool connected, interruptRead, noReads;
+	volatile bool connected, interruptRead;
+	bool noReads, begun;
 	std::thread *readThread;
 
 	void performReads();
