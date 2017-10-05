@@ -53,14 +53,11 @@ protected:
 	void failedRead();
 	int getData(char *buff, const int &buffSize);
 public:
-	NetworkConnection();
 	NetworkConnection(const int &port, const int &connectionType = SOCK_STREAM, const char *ipaddr = "", const bool &noReads = false);
 	NetworkConnection(const NetworkConnection &other);
 	~NetworkConnection();
 	
-	NetworkConnection operator=(const NetworkConnection &other);
-
-	bool write(const char *buff, const int &buffSize);
+	bool write(char *buff, const int &buffSize);
 };
 
 #endif 
