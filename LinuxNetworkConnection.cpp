@@ -47,6 +47,7 @@ bool NetworkConnection::connectToServer() {
         fprintf(stderr, "Couldn't connect to server. Will retry in a second.");
         std::this_thread::sleep_for(std::chrono::seconds(1));
 	}
+	printf("Connected to server.\n");
 	connected = true;
     return true;
 }
