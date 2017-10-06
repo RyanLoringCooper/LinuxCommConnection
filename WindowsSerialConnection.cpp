@@ -79,10 +79,6 @@ SerialPort::SerialPort(char *portName, const bool &noReads) : CommConnection(noR
     }
 }
 
-SerialPort::~SerialPort() {
-    exitGracefully();   
-}
-
 bool SerialPort::write(const char *buff, const int &buffSize) {
     if(!connected) 
         return false;

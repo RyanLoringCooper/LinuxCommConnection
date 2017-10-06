@@ -101,10 +101,6 @@ SerialConnection::SerialConnection(char *portName, const int &speed, const int &
 	connected = true;
 }
 
-SerialConnection::~SerialConnection() {
-	exitGracefully();	
-}
-
 bool SerialConnection::write(const char *buff, const int &buffSize) {
 	if(!connected) 
 		return false;

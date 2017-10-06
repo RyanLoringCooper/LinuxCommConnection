@@ -6,4 +6,6 @@
 #error Unsupported os
 #endif
 
-SerialConnection::SerialConnection() : CommConnection() {}
+SerialPort::~SerialPort() {
+    terminate();
+}

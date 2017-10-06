@@ -21,6 +21,6 @@ NetworkConnection::NetworkConnection(const int &port, const int &connectionType,
 }
 
 NetworkConnection::~NetworkConnection() {
-	exitGracefully();
+	terminate();
 }
 

@@ -13,7 +13,7 @@ protected:
 	char *buffer;
 	int readIndex, writeIndex;
 	volatile bool connected, interruptRead;
-	bool noReads, begun;
+	bool noReads, begun, terminated;
 	std::thread *readThread;
 
 	void performReads();
@@ -25,7 +25,6 @@ protected:
 	virtual void exitGracefully() = 0;
 public:
 	CommConnection(const bool &noReads = false);
-	~CommConnection();
 
 	bool begin();
 	int available() const;

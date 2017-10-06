@@ -48,10 +48,6 @@ CommConnection::CommConnection(const bool &noReads) {
 	writeIndex = 0;	
 }
 
-CommConnection::~CommConnection() {
-	closeThread();	
-}
-
 bool CommConnection::begin() {
 	if(connected) {
 		begun = true;
@@ -129,7 +125,10 @@ void CommConnection::clearBuffer() {
 }
 
 void CommConnection::terminate() {
-	closeThread();
-	//delete[] buffer;
-	exitGracefully();
+	if(!terminated) {
+		terminated = true;
+		closeThread();
+		//delete[] buffer;
+		exitGracefully();
+	}
 }
