@@ -42,6 +42,7 @@ CommConnection::CommConnection(const bool &noReads) {
 	this->noReads = noReads;
 	connected = false;
 	interruptRead = false;
+	terminated = false;
 	buffer = new char[BUFFER_SIZE+1];
 	memset(buffer, 0, BUFFER_SIZE+1);
 	readIndex = 0;
