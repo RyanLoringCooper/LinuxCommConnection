@@ -6,22 +6,26 @@
 NetworkConnection *con0, *con1;
 
 void startCon0() {
-    con0 = new NetworkConnection(PORT, SOCK_STREAM);
+    con0 = new NetworkConnection(PORT, SOCK_DGRAM, "", 0);
     printf("fack!\n");
     con0->begin();
     printf("fack!\n");
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    con0->write("dirt", 5);
+    for(int i = 0; i < 100; i++) {
+        con0->write("dirt", 5);
+    }
     con0->terminate();
 }
 
 void startCon1() {
-    con1 = new NetworkConnection(PORT, SOCK_STREAM, "127.0.0.1");
+    con1 = new NetworkConnection(PORT, SOCK_DGRAM, "127.0.0.1", 0);
     printf("fack!\n");
     con1->begin();
     printf("fack!\n");
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    con1->write("dirt", 5);
+    for(int i = 0; i < 100; i++) {
+        con1->write("dirt", 5);
+    }
     con1->terminate();
 }
 

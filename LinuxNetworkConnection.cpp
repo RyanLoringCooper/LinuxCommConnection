@@ -33,6 +33,9 @@ bool NetworkConnection::setupClient(const char *ipaddr, const int &port) {
     bcopy((char *)server->h_addr, (char *)&connAddr.sin_addr, server->h_length);
 	connAddr.sin_port = htons(port);
 	mSocket = socket(connAddr.sin_family, connectionType, 0);
+    if(blockingTime >= 0) {
+        fcntl(mSocket, F_SETFL, O_NONBLOCK);
+    }
 	if(connectionType == SOCK_STREAM) {
 		return connectToServer();
 	} else {
@@ -64,6 +67,9 @@ bool NetworkConnection::waitForClientConnection() {
 		close(mSocket);
 		return false;
 	} else {
+        if(blockingTime >= 0) {
+            fcntl(clientSocket, F_SETFL, O_NONBLOCK);
+        }
 		printf("IPv4 client connected!\n");
 		connected = true;
 		return true;

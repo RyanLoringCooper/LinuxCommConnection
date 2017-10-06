@@ -9,9 +9,11 @@ void CommConnection::performReads() {
 		bytesRead = getData(buff, MAX_DATA_LENGTH);
  	    if (bytesRead > 0) {
 	        fillBuffer(buff, bytesRead);
-	    } else if(bytesRead < 0) {
+	    } else if(bytesRead < 0 && blockingTime < 0) {
 			failedRead();
-		}	
+		} else if(blockingTime != 0) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(blockingTime));
+        }
 	}
 }
 
@@ -38,7 +40,8 @@ void CommConnection::closeThread() {
 	}
 }
 
-CommConnection::CommConnection(const bool &noReads) {
+CommConnection::CommConnection(const int &blockingTime, const bool &noReads) {
+    this->blockingTime = blockingTime;
 	this->noReads = noReads;
 	connected = false;
 	interruptRead = false;

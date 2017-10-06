@@ -6,6 +6,7 @@
 #if defined(__linux__) || defined(__linux) || defined(linux) 
 
 #include <unistd.h>
+#include <fcntl.h>
 #include <sys/types.h> 
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -53,7 +54,7 @@ protected:
 	void failedRead();
 	int getData(char *buff, const int &buffSize);
 public:
-	NetworkConnection(const int &port, const int &connectionType = SOCK_STREAM, const char *ipaddr = "", const bool &noReads = false);
+	NetworkConnection(const int &port, const int &connectionType = SOCK_STREAM, const char *ipaddr = "", const int &blockingTime = -1, const bool &noReads = false);
 	NetworkConnection(const NetworkConnection &other);
 	~NetworkConnection();
 	

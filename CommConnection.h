@@ -3,6 +3,7 @@
 #define COMMCONNECTION_H
 
 #include <thread>
+#include <chrono>
 #include <cstring>
 
 #define MAX_DATA_LENGTH 32
@@ -13,7 +14,8 @@ protected:
 	char *buffer;
 	int readIndex, writeIndex;
 	volatile bool connected, interruptRead;
-	bool noReads, begun, terminated;
+    // blockingTime is in milliseconds
+	bool noReads, begun, terminated, blockingTime;
 	std::thread *readThread;
 
 	void performReads();
@@ -24,7 +26,7 @@ protected:
 	virtual int getData(char *buff, const int &buffSize) = 0;
 	virtual void exitGracefully() = 0;
 public:
-	CommConnection(const bool &noReads = false);
+	CommConnection(const int &blockingTime = -1, const bool &noReads = false);
 
 	bool begin();
 	int available() const;
