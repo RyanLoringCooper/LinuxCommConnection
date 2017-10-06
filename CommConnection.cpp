@@ -34,6 +34,7 @@ void CommConnection::closeThread() {
 	if(readThread != NULL && readThread->joinable()) {
 		readThread->join();
 		delete readThread;
+		readThread = NULL;
 	}
 }
 
