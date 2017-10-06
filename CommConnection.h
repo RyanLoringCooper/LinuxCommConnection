@@ -35,6 +35,7 @@ public:
 	void clearBuffer();	
 	void terminate();
 
+    virtual ~CommConnection();
 	virtual bool write(const char *buff, const int &bufSize) = 0;
 };
 

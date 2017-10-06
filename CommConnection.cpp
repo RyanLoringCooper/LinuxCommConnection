@@ -133,3 +133,7 @@ void CommConnection::terminate() {
 		exitGracefully();
 	}
 }
+
+CommConnection::~CommConnection() {
+    terminate();
+}
