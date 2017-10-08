@@ -36,7 +36,7 @@ class NetworkConnection : public CommConnection {
 protected:
 #if defined(__linux__) || defined(__linux) || defined(linux) 
 	int mSocket, clientSocket;
-	struct sockaddr_in connAddr;
+	struct sockaddr_in mAddr, rAddr;
 #elif defined(_WIN32)
 	SOCKET mSocket, clientSocket;
     struct addrinfo *result;
@@ -44,6 +44,7 @@ protected:
 #error Unsupported os
 #endif
 	int connectionType;
+    bool server;
 
 	bool setupServer(const int &port);
 	bool setupClient(const char *ipaddr, const int &port);

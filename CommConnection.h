@@ -12,10 +12,10 @@
 class CommConnection {
 protected:
 	char *buffer;
-	int readIndex, writeIndex;
+	int readIndex, writeIndex, blockingTime;
 	volatile bool connected, interruptRead;
     // blockingTime is in milliseconds
-	bool noReads, begun, terminated, blockingTime;
+	bool noReads, begun, terminated;
 	std::thread *readThread;
 
 	void performReads();
