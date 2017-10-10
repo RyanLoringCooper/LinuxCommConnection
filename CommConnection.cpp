@@ -76,8 +76,7 @@ int CommConnection::available() const {
 
 int CommConnection::waitForData() {
 	std::unique_lock<std::mutex> lk(dataMutex);
-	cv.wait(lk []{return cvBool});
-	printf("%d", available());
+	cv.wait(lk, [this]{return this->cvBool;});
 	return available();
 }
 
