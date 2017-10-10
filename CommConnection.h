@@ -5,6 +5,8 @@
 #include <thread>
 #include <chrono>
 #include <cstring>
+#include <mutex>
+#include <condition_variable>
 
 #define MAX_DATA_LENGTH 32
 #define BUFFER_SIZE 4096
@@ -15,8 +17,10 @@ protected:
 	int readIndex, writeIndex, blockingTime;
 	volatile bool connected, interruptRead;
     // blockingTime is in milliseconds
-	bool noReads, begun, terminated;
+	bool noReads, begun, terminated, cvBool;
 	std::thread *readThread;
+	std::mutex dataMutex;
+	std::condition_variable cv;
 
 	void performReads();
 	void fillBuffer(char *buff, const int &bytesRead);

@@ -11,9 +11,7 @@ void connectionLoop(NetworkConnection *con, const char *sendbuf, const int &send
     int avail;
     for(int i = 0; i < 10; i++) {
         con->write(sendbuf, sendbuflen);
-        do {
-            avail = con->available();
-        } while(!avail);
+        avail = con->waitForData();
         con->read(buff, avail);
         printf("%s\n", buff);
         if(strcmp(buff, exitbuf) == 0) {

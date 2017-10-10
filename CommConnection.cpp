@@ -9,6 +9,8 @@ void CommConnection::performReads() {
 		bytesRead = getData(buff, MAX_DATA_LENGTH);
  	    if (bytesRead > 0) {
 	        fillBuffer(buff, bytesRead);
+	        cvBool = true;
+	        cv.notify_one();
 	    } else if(bytesRead < 0 && blockingTime < 0) {
 			failedRead();
 		} else if(blockingTime != 0) {
@@ -46,6 +48,7 @@ CommConnection::CommConnection(const int &blockingTime, const bool &noReads) {
 	connected = false;
 	interruptRead = false;
 	terminated = false;
+	cvBool = false;
 	buffer = new char[BUFFER_SIZE+1];
 	memset(buffer, 0, BUFFER_SIZE+1);
 	readIndex = 0;
@@ -69,6 +72,13 @@ int CommConnection::available() const {
 	if(retval < 0) 
 		retval = writeIndex+BUFFER_SIZE-readIndex;
 	return retval;
+}
+
+int CommConnection::waitForData() {
+	std::unique_lock<std::mutex> lk(dataMutex);
+	cv.wait(lk []{return cvBool});
+	printf("%d", available());
+	return available();
 }
 
 char CommConnection::read() {
