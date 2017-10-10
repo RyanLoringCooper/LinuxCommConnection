@@ -25,7 +25,7 @@ void connectionLoop(NetworkConnection *con, const char *sendbuf, const int &send
 
 void startCon0() {
     char buff[2048];
-    con0 = new NetworkConnection(PORT, SOCK_DGRAM, "", 100);
+    con0 = new NetworkConnection(PORT, SOCK_DGRAM, "", -1);
     printf("fack!\n");
     con0->begin();
     printf("fack!\n");
@@ -35,7 +35,7 @@ void startCon0() {
 
 void startCon1() {
     char buff[2048];
-    con1 = new NetworkConnection(PORT, SOCK_DGRAM, "127.0.0.1", 100);
+    con1 = new NetworkConnection(PORT, SOCK_DGRAM, "127.0.0.1", -1);
     printf("fack!\n");
     con1->begin();
     printf("fack!\n");

@@ -147,6 +147,8 @@ void CommConnection::clearBuffer() {
 void CommConnection::terminate() {
 	if(!terminated) {
 		terminated = true;
+        cvBool = true;
+        cv.notify_all();
 		closeThread();
 		//delete[] buffer;
 		exitGracefully();
