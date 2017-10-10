@@ -34,6 +34,7 @@ public:
 
 	bool begin();
 	int available() const;
+	int waitForData();
 	char read();
 	void read(char *buff, const unsigned int &bytesToRead);
 	int readUntil(char *buff, const int &buffSize, const char &delim);
