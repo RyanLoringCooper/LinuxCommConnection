@@ -127,7 +127,6 @@ bool NetworkConnection::write(const char *buff, const int &buffSize) {
 	} else if(server) {
         socket = &mSocket;
         addr = &rAddr;
-        printf("Server sending\n");
 	} else {
         socket = &mSocket;
         addr = &mAddr;
