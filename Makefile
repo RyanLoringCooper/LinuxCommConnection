@@ -7,12 +7,12 @@ OBJ_DIR			= obj/
 BUILD_DIR		= build/
 VPATH			= tests
 
-all: PointerExample
+all: NetTest
 	@echo Compiled all targets
 
-PointerExample: $(OBJS) PointerExample.o
+NetTest: $(OBJS) NetTest.o
 	@mkdir -p $(BUILD_DIR)
-	$(CXX) $(CXXFLAGS) -o $(BUILD_DIR)PointerExample $(patsubst %.o, $(OBJ_DIR)%.o, $(OBJS)) $(OBJ_DIR)PointerExample.o
+	$(CXX) $(CXXFLAGS) -o $(BUILD_DIR)NetTest $(patsubst %.o, $(OBJ_DIR)%.o, $(OBJS)) $(OBJ_DIR)NetTest.o
 
 clean:
 	$(RM) -rf $(BUILD_DIR)

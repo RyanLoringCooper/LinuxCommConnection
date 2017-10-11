@@ -53,7 +53,7 @@ bool NetworkConnection::setupClient(const char *ipaddr, const int &port) {
 
 bool NetworkConnection::connectToServer() {
 	while(connect(mSocket,(struct sockaddr *) &mAddr,sizeof(mAddr)) < 0 && !interruptRead) {
-        fprintf(stderr, "Couldn't connect to server. Will retry in a second.");
+        fprintf(stderr, "Couldn't connect to server. Will retry in a second.\n");
         std::this_thread::sleep_for(std::chrono::seconds(1));
 	}
 	printf("Connected to server.\n");
