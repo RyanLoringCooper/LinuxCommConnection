@@ -6,6 +6,6 @@
 #error Unsupported os
 #endif
 
-SerialPort::~SerialPort() {
+SerialConnection::~SerialConnection() {
     terminate();
 }

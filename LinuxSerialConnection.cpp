@@ -8,7 +8,7 @@ void SerialConnection::failedRead() {
 int SerialConnection::getData(char *buff, const int &buffSize) {
 	if(!connected)
 		return -1; 
-	return read(ser, buff, buffSize);
+	return ::read(ser, buff, buffSize);
 }
 
 void SerialConnection::exitGracefully() {
@@ -77,26 +77,24 @@ int SerialConnection::set_blocking (const bool &should_block) {
 
 
 // public:
-SerialConnection::SerialConnection() : CommConnection() {
-	connected = false;
-}
-
 // speed should have a B in front of it (ie. B57600)
 // I recommend parity 0
 SerialConnection::SerialConnection(char *portName, const int &speed, const int &parity, const int &blockingTime, const bool &noReads) : CommConnection(blockingTime, noReads) {
 	connected = false;
-	ser = open (portname, O_RDWR | O_NOCTTY | O_SYNC);
+	ser = open (portName, O_RDWR | O_NOCTTY | O_SYNC);
 	if (ser < 0) {
-		fprintf(stderr, "error %d opening %s\n", errno, portname);
+		fprintf(stderr, "error %d opening %s\n", errno, portName);
 		return;
 	}
-	if(set_interface_attribs (ser, speed, parity) != 0) {
+	if(set_interface_attribs (speed, parity) != 0) {
 		fprintf(stderr, "Could not set serial parameters.\n");
 		return;
 	}
-	if(set_blocking(true) != 0) {
-		fprintf(stderr, "Could not set serial port to blocking.\n");
-		return;
+	if(blockingTime == -1) {
+		if(set_blocking(true) != 0) {
+			fprintf(stderr, "Could not set serial port to blocking.\n");
+			return;
+		}
 	}
 	connected = true;
 }
@@ -104,5 +102,5 @@ SerialConnection::SerialConnection(char *portName, const int &speed, const int &
 bool SerialConnection::write(const char *buff, const int &buffSize) {
 	if(!connected) 
 		return false;
-	return (bool) write(ser, buff, buffSize);
+	return (bool) ::write(ser, buff, buffSize);
 }
