@@ -1,7 +1,7 @@
 #if defined(__linux__) || defined(__linux) || defined(linux)
-#include "LinuxSerialConnection.cpp"
+#include "Linux/LinuxSerialConnection.cpp"
 #elif defined(_WIN32)
-#include "WindowsSerialConnection.cpp"
+#include "Windows/WindowsSerialConnection.cpp"
 #else
 #error Unsupported os
 #endif

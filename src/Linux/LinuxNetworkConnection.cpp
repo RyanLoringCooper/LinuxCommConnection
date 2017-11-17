@@ -1,5 +1,5 @@
 #include <errno.h>
-#include "NetworkConnection.h"
+#include "../NetworkConnection.h"
 
 // protected
 

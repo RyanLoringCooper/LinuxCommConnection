@@ -1,4 +1,4 @@
-#include "NetworkConnection.h"
+#include "../NetworkConnection.h"
 
 // protected
 bool NetworkConnection::setupServer(const int &port) {

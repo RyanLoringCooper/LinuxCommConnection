@@ -1,4 +1,4 @@
-#include "SerialConnection.h"
+#include "../SerialConnection.h"
 
 // protected:
 void SerialConnection::failedRead() {

@@ -1,11 +1,11 @@
-#include "SerialPort.h"
+#include "../SerialConnection.h"
 
 // protected:
-void SerialPort::failedRead() {
+void SerialConnection::failedRead() {
     printf("Failed to read from socket with error: %d", GetLastError());
 }
 
-int SerialPort::getData(char *buff, const int &buffSize) {
+int SerialConnection::getData(char *buff, const int &buffSize) {
     if(!connected)
         return -1; 
     DWORD toRead, bytesRead, errors;
@@ -28,7 +28,7 @@ int SerialPort::getData(char *buff, const int &buffSize) {
     return 0;
 }
 
-void SerialPort::exitGracefully() {
+void SerialConnection::exitGracefully() {
     char *stop = new char[4];
     memset(stop, 0, 4);
     write(stop, 4);
@@ -42,7 +42,7 @@ void SerialPort::exitGracefully() {
 
 // public:
 
-SerialPort::SerialPort(char *portName, const int &blockingTime, const bool &noReads) : CommConnection(blockingTime, noReads) {
+SerialConnection::SerialConnection(char *portName, const int &blockingTime, const bool &noReads) : CommConnection(blockingTime, noReads) {
     handler = CreateFileA(static_cast<LPCSTR>(portName),
         GENERIC_READ | GENERIC_WRITE,
         0,
@@ -79,7 +79,7 @@ SerialPort::SerialPort(char *portName, const int &blockingTime, const bool &noRe
     }
 }
 
-bool SerialPort::write(const char *buff, const int &buffSize) {
+bool SerialConnection::write(const char *buff, const int &buffSize) {
     if(!connected) 
         return false;
     DWORD bytesSend, errors;
