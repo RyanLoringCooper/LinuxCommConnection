@@ -140,6 +140,17 @@ int CommConnection::readUntil(char *buff, const int &buffSize, const char &delim
 	}
 }
 
+std::string CommConnection::readString(const unsigned int &bytesToRead) {
+    int goingToRead = bytesToRead;
+    if(goingToRead == -1) {
+        goingToRead = available();
+    }
+    char buff[goingToRead];
+    memset(buff, 0, goingToRead);
+    read(buff, goingToRead);
+    return std::string(buff);
+}
+
 bool CommConnection::isConnected() const {
 	return connected;
 }

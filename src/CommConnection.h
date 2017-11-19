@@ -40,6 +40,7 @@ public:
 	char read();
 	void read(char *buff, const unsigned int &bytesToRead);
 	int readUntil(char *buff, const int &buffSize, const char &delim);
+    std::string readString(const unsigned int &bytesToRead = -1);
 	bool isConnected() const;
 	void clearBuffer();	
 	void terminate();
