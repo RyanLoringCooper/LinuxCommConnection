@@ -7,6 +7,9 @@ void CommConnection::performReads() {
 	int bytesRead;
 	while(!interruptRead) {
 		bytesRead = getData(buff, MAX_DATA_LENGTH);
+        if(debug) {
+            printf("reading finished %s\n", buff);
+        }
  	    if (bytesRead > 0) {
 	        fillBuffer(buff, bytesRead);
 	        cvBool = true;

@@ -1,9 +1,9 @@
 #if defined(__linux__) || defined(__linux) || defined(linux)
-#include "Linux/LinuxNetworkConnection.cpp"
+    #include "Linux/NetworkConnection.cpp"
 #elif defined(_WIN32)
-#include "Windows/WindowsNetworkConnection.cpp"
+    #include "Windows/NetworkConnection.cpp"
 #else
-#error Unsupported os
+    #error Unsupported os
 #endif
 
 NetworkConnection::NetworkConnection(const int &port, const int &connectionType, const char *ipaddr, const int &blockingTime, const bool &debug, const bool &noReads) : CommConnection(blockingTime, debug, noReads) {
