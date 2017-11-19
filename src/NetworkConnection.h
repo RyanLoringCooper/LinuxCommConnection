@@ -4,29 +4,24 @@
 #undef UNICODE
 
 #if defined(__linux__) || defined(__linux) || defined(linux) 
-
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/types.h> 
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netdb.h> 
-#include <errno.h>
-
+    #include <unistd.h>
+    #include <fcntl.h>
+    #include <sys/types.h> 
+    #include <sys/socket.h>
+    #include <netinet/in.h>
+    #include <netdb.h> 
+    #include <errno.h>
 #elif defined(_WIN32)
-
-#define WIN32_LEAN_AND_MEAN
-
-#include <windows.h>
-#include <winsock2.h>
-#include <ws2tcpip.h>
-// Need to link with Ws2_32.lib
-#pragma comment (lib, "Ws2_32.lib")
-#pragma comment (lib, "Mswsock.lib")
-#pragma comment (lib, "AdvApi32.lib")
-
+    #define WIN32_LEAN_AND_MEAN
+    #include <windows.h>
+    #include <winsock2.h>
+    #include <ws2tcpip.h>
+    // Need to link with Ws2_32.lib
+    #pragma comment (lib, "Ws2_32.lib")
+    #pragma comment (lib, "Mswsock.lib")
+    #pragma comment (lib, "AdvApi32.lib")
 #else
-#error Unsupported os
+    #error Unsupported os
 #endif
 
 #include <cstdlib>
@@ -57,9 +52,10 @@ protected:
 	void exitGracefully();
     bool setBlocking(const int &blockingTime = -1);
 public:
-	NetworkConnection(const int &port, const int &connectionType = SOCK_STREAM, const char *ipaddr = "", const int &blockingTime = -1, const bool &noReads = false);
+	NetworkConnection(const int &port, const int &connectionType = SOCK_STREAM, const char *ipaddr = "", const int &blockingTime = -1, const bool &debug = false, const bool &noReads = false);
 	NetworkConnection(const NetworkConnection &other);
 	~NetworkConnection();
+    using CommConnection::write;
 	
 	bool write(const char *buff, const int &buffSize);
 };

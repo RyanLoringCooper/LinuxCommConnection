@@ -25,12 +25,11 @@ srcs: $(BINS)
 	@echo Compiled sources
 
 tests: $(TEST_BINS)
-	@echo $(LIBS)
 	@echo Compiled tests
 
 %$(TEST_SUFFIX): $(TEST_OBJS) $(SRC_OBJS) 
-	@mkdir -p $(BUILD_DIR)tests
-	$(CXX) $(CXXFLAGS) -o $(BUILD_DIR)tests/$(BIN) $(patsubst %.o, $(OBJ_DIR)%.o, $(patsubst %$(TEST_SUFFIX), %.o, $@)) $(patsubst %.o, $(OBJ_DIR)%.o, $(SRC_OBJS)) $(LIBS)
+	@mkdir -p $(BUILD_DIR)
+	$(CXX) $(CXXFLAGS) -o $(BUILD_DIR)$(BIN:$(TEST_SUFFIX)=) $(patsubst %.o, $(OBJ_DIR)%.o, $(patsubst %$(TEST_SUFFIX), %.o, $@)) $(patsubst %.o, $(OBJ_DIR)%.o, $(SRC_OBJS)) $(LIBS)
 
 clean:
 	$(RM) -rf $(BUILD_DIR)

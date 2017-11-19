@@ -82,6 +82,9 @@ bool NetworkConnection::waitForClientConnection() {
 }
 
 void NetworkConnection::failedRead() {
+    if(debug) {
+        printf("Failed to read from socket.\n");
+    }
 	connected = false;
 	if(connectionType == SOCK_STREAM) {
 		if(clientSocket > 0) {

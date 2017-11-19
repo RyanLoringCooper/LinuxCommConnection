@@ -42,7 +42,7 @@ void SerialConnection::exitGracefully() {
 
 // public:
 
-SerialConnection::SerialConnection(char *portName, const int &blockingTime, const bool &noReads) : CommConnection(blockingTime, noReads) {
+SerialConnection::SerialConnection(char *portName, const int &blockingTime, const bool &debug, const bool &noReads) : CommConnection(blockingTime, debug, noReads) {
     handler = CreateFileA(static_cast<LPCSTR>(portName),
         GENERIC_READ | GENERIC_WRITE,
         0,

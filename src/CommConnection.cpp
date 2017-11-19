@@ -42,8 +42,9 @@ void CommConnection::closeThread() {
 	}
 }
 
-CommConnection::CommConnection(const int &blockingTime, const bool &noReads) {
+CommConnection::CommConnection(const int &blockingTime, const bool &debug, const bool &noReads) {
     this->blockingTime = blockingTime;
+    this->debug = debug;
 	this->noReads = noReads;
 	connected = false;
 	interruptRead = false;
@@ -154,6 +155,10 @@ void CommConnection::terminate() {
 		exitGracefully();
 	}
 }
+
+bool CommConnection::write(const std::string &buff) {
+    return write(buff.c_str(), buff.length());
+} 
 
 CommConnection::~CommConnection() {
     terminate();

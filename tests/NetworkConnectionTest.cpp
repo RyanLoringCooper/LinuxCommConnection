@@ -5,10 +5,13 @@
 #include <sys/wait.h>
 #include <thread>
 #include <chrono>
+#include <string>
 #include "../src/NetworkConnection.h"
 
 #define BUFF_SIZE 256
-#define PORT 12341
+#define PORT 12345
+
+std::string message("Hello"), endingMessage("exit");
 
 void runTest(const int &connectionType, const int &delayTime) {
     if(fork() == 0) {
@@ -21,10 +24,13 @@ void runTest(const int &connectionType, const int &delayTime) {
             server.waitForData();
             server.read(recvBuff, server.available());
             std::cout << "Server got: " << recvBuff << std::endl;
+            if(strcmp(recvBuff, endingMessage.c_str()) == 0) {
+                break;
+            }
             memset(&recvBuff[0], 0, BUFF_SIZE);
-            server.write("Hello", 6);
-            printf("Server sending\n");
+            server.write(message);
         }
+        server.write(endingMessage);
         server.terminate();
     } else {
         // parent code
@@ -34,12 +40,15 @@ void runTest(const int &connectionType, const int &delayTime) {
         client.begin();
         std::this_thread::sleep_for(std::chrono::seconds(5));
         for(int i = 0; i < 3; i++) {
-            client.write("Hello", 6);
-            printf("Client sending\n");
+            client.write(message);
             client.waitForData();
             client.read(recvBuff, client.available());
             std::cout << "Client got: " << recvBuff << std::endl;
+            if(strcmp(recvBuff, endingMessage.c_str()) == 0) {
+                break;
+            }
         }
+        client.write(endingMessage);
         client.terminate();
         int status;
         waitpid(-1, &status, 0);
@@ -49,19 +58,19 @@ void runTest(const int &connectionType, const int &delayTime) {
 int main() {
     std::cout << "Testing UDP with blocking reads" << std::endl;
 	runTest(SOCK_DGRAM, -1);
-    std::cout << "Testing TCP with blocking reads" << std::endl;
+    std::cout << "\nTesting TCP with blocking reads" << std::endl;
 	runTest(SOCK_STREAM, -1);
-    std::cout << "Testing UDP with 100 ms timeout on reads" << std::endl;
+    std::cout << "\nTesting UDP with 100 ms timeout on reads" << std::endl;
 	runTest(SOCK_DGRAM, 100);
-    std::cout << "Testing TCP with 100 ms timeout on reads" << std::endl;
+    std::cout << "\nTesting TCP with 100 ms timeout on reads" << std::endl;
 	runTest(SOCK_STREAM, 100);
-    std::cout << "Testing UDP with 10 ms timeout on reads" << std::endl;
+    std::cout << "\nTesting UDP with 10 ms timeout on reads" << std::endl;
 	runTest(SOCK_DGRAM, 10);
-    std::cout << "Testing TCP with 10 ms timeout on reads" << std::endl;
+    std::cout << "\nTesting TCP with 10 ms timeout on reads" << std::endl;
 	runTest(SOCK_STREAM, 10);
-    std::cout << "Testing UDP with 0 ms timeout on reads" << std::endl;
+    std::cout << "\nTesting UDP with 0 ms timeout on reads" << std::endl;
 	runTest(SOCK_DGRAM, 0);
-    std::cout << "Testing TCP with 0 ms timeout on reads" << std::endl;
+    std::cout << "\nTesting TCP with 0 ms timeout on reads" << std::endl;
 	runTest(SOCK_STREAM, 0);
 	return 0;
 }

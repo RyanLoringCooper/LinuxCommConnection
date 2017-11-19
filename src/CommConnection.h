@@ -5,6 +5,7 @@
 #include <thread>
 #include <chrono>
 #include <cstring>
+#include <string>
 #include <mutex>
 #include <condition_variable>
 
@@ -17,7 +18,7 @@ protected:
 	int readIndex, writeIndex, blockingTime;
 	volatile bool connected, interruptRead;
     // blockingTime is in milliseconds
-	bool noReads, begun, terminated, cvBool;
+	bool noReads, begun, terminated, cvBool, debug;
 	std::thread *readThread;
 	std::mutex dataMutex;
 	std::condition_variable cv;
@@ -31,7 +32,7 @@ protected:
 	virtual void exitGracefully() = 0;
     virtual bool setBlocking(const int &blockingTime = -1) = 0;
 public:
-	CommConnection(const int &blockingTime = -1, const bool &noReads = false);
+	CommConnection(const int &blockingTime = -1, const bool &debug = false, const bool &noReads = false);
 
 	bool begin();
 	int available() const;
@@ -42,6 +43,7 @@ public:
 	bool isConnected() const;
 	void clearBuffer();	
 	void terminate();
+    bool write(const std::string &buff);
 
     virtual ~CommConnection();
 	virtual bool write(const char *buff, const int &bufSize) = 0;

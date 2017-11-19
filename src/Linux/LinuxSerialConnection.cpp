@@ -81,7 +81,7 @@ bool SerialConnection::setBlocking(const int &blockingTime) {
 // public:
 // speed should have a B in front of it (ie. B57600)
 // I recommend parity 0
-SerialConnection::SerialConnection(char *portName, const int &speed, const int &parity, const int &blockingTime, const bool &noReads) : CommConnection(blockingTime, noReads) {
+SerialConnection::SerialConnection(char *portName, const int &speed, const int &parity, const int &blockingTime, const bool &debug, const bool &noReads) : CommConnection(blockingTime, debug, noReads) {
 	connected = false;
 	ser = open (portName, O_RDWR | O_NOCTTY | O_SYNC);
 	if (ser < 0) {

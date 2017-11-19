@@ -6,7 +6,7 @@
 #error Unsupported os
 #endif
 
-NetworkConnection::NetworkConnection(const int &port, const int &connectionType, const char *ipaddr, const int &blockingTime, const bool &noReads) : CommConnection(blockingTime, noReads) {
+NetworkConnection::NetworkConnection(const int &port, const int &connectionType, const char *ipaddr, const int &blockingTime, const bool &debug, const bool &noReads) : CommConnection(blockingTime, debug, noReads) {
 	this->connectionType = connectionType;
 	if(strcmp(ipaddr, "") == 0) {
         server = true;
@@ -25,4 +25,3 @@ NetworkConnection::NetworkConnection(const int &port, const int &connectionType,
 NetworkConnection::~NetworkConnection() {
 	terminate();
 }
-
