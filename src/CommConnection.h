@@ -29,6 +29,7 @@ protected:
 	virtual void failedRead() = 0;
 	virtual int getData(char *buff, const int &buffSize) = 0;
 	virtual void exitGracefully() = 0;
+    virtual bool setBlocking(const int &blockingTime = -1) = 0;
 public:
 	CommConnection(const int &blockingTime = -1, const bool &noReads = false);
 

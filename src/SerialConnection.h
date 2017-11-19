@@ -35,6 +35,7 @@ protected:
 	void failedRead();
 	int getData(char *buff, const int &buffSize);
 	void exitGracefully();
+    bool setBlocking(const int &blockingTime = -1);
 public:
 	SerialConnection(char *portName, const int &speed, const int &parity, const int &blockingTime = -1, const bool &noReads = false);
 	~SerialConnection();

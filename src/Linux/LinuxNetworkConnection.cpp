@@ -1,4 +1,3 @@
-#include <errno.h>
 #include "../NetworkConnection.h"
 
 // protected
@@ -82,13 +81,16 @@ bool NetworkConnection::waitForClientConnection() {
 	}
 }
 
-void NetworkConnection::exitGracefully() {
-	// shutdown the send half of the connection since no more data will be sent
-	// cleanup
-	if(clientSocket > 0)
-		close(clientSocket);
-	if(mSocket > 0)
-		close(mSocket);
+void NetworkConnection::failedRead() {
+	connected = false;
+	if(connectionType == SOCK_STREAM) {
+		if(clientSocket > 0) {
+			close(clientSocket);
+			waitForClientConnection();
+		} else {
+			connectToServer();
+		}
+	}
 }
 
 int NetworkConnection::getData(char *buff, const int &buffSize) {
@@ -103,16 +105,30 @@ int NetworkConnection::getData(char *buff, const int &buffSize) {
 	return -1;
 }
 
-void NetworkConnection::failedRead() {
-	connected = false;
-	if(connectionType == SOCK_STREAM) {
+void NetworkConnection::exitGracefully() {
+	// shutdown the send half of the connection since no more data will be sent
+	// cleanup
+	if(clientSocket > 0)
+		close(clientSocket);
+	if(mSocket > 0)
+		close(mSocket);
+}
+
+bool NetworkConnection::setBlocking(const int &blockingTime) {
+    if(blockingTime != -1) {
+        int response;
 		if(clientSocket > 0) {
-			close(clientSocket);
-			waitForClientConnection();
+            response = fcntl(mSocket, F_SETFL, fcntl(mSocket, F_GETFL) | O_NONBLOCK);
+            //response = fcntl(clientSocket, F_SETFL, fcntl(clientSocket, F_GETFL) | O_NONBLOCK);
 		} else {
-			connectToServer();
+            response = fcntl(mSocket, F_SETFL, fcntl(mSocket, F_GETFL) | O_NONBLOCK);
 		}
-	}
+        if(response < 0) {
+            fprintf(stderr, "Could not set socket to nonblocking with error %d", errno);        
+            return false;
+        }    
+    }
+    return true;
 }
 
 // public 

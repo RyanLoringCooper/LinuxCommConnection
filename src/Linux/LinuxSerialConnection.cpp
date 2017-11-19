@@ -56,23 +56,25 @@ int SerialConnection::set_interface_attribs (const int &speed, const int &parity
 	return 0;
 }
 
-// taken from https://stackoverflow.com/questions/6947413/how-to-open-read-and-write-from-serial-port-in-c
-int SerialConnection::set_blocking (const bool &should_block) {
-	struct termios tty;
-	memset (&tty, 0, sizeof(tty));
-	if (tcgetattr (ser, &tty) != 0) {
-		fprintf(stderr,"error %d from tggetattr\n", errno);
-		return -1;
-	}
+// adapted from https://stackoverflow.com/questions/6947413/how-to-open-read-and-write-from-serial-port-in-c
+bool SerialConnection::setBlocking(const int &blockingTime) {
+	if(blockingTime == -1) {
+        struct termios tty;
+        memset (&tty, 0, sizeof(tty));
+        if (tcgetattr (ser, &tty) != 0) {
+            fprintf(stderr,"error %d from tggetattr\n", errno);
+            return false;
+        }
 
-	tty.c_cc[VMIN]  = should_block ? 1 : 0;
-	tty.c_cc[VTIME] = 5;            // 0.5 seconds read timeout
+        tty.c_cc[VMIN]  = 1;            // sets blocking to true
+        tty.c_cc[VTIME] = blockingTime/100;            // 0.5 seconds read timeout
 
-	if (tcsetattr (ser, TCSANOW, &tty) != 0) {
-		fprintf(stderr, "error %d setting term attributes\n", errno);
-		return -1;
-	}
-	return 0;
+        if (tcsetattr (ser, TCSANOW, &tty) != 0) {
+            fprintf(stderr, "error %d setting term attributes\n", errno);
+            return false;
+        }
+    }
+	return true;
 }
 
 
@@ -89,12 +91,6 @@ SerialConnection::SerialConnection(char *portName, const int &speed, const int &
 	if(set_interface_attribs (speed, parity) != 0) {
 		fprintf(stderr, "Could not set serial parameters.\n");
 		return;
-	}
-	if(blockingTime == -1) {
-		if(set_blocking(true) != 0) {
-			fprintf(stderr, "Could not set serial port to blocking.\n");
-			return;
-		}
 	}
 	connected = true;
 }

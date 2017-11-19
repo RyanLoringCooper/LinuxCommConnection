@@ -11,6 +11,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h> 
+#include <errno.h>
 
 #elif defined(_WIN32)
 
@@ -50,10 +51,11 @@ protected:
 	bool setupClient(const char *ipaddr, const int &port);
 	bool waitForClientConnection();
 	bool connectToServer();
-	void exitGracefully();
 
 	void failedRead();
 	int getData(char *buff, const int &buffSize);
+	void exitGracefully();
+    bool setBlocking(const int &blockingTime = -1);
 public:
 	NetworkConnection(const int &port, const int &connectionType = SOCK_STREAM, const char *ipaddr = "", const int &blockingTime = -1, const bool &noReads = false);
 	NetworkConnection(const NetworkConnection &other);

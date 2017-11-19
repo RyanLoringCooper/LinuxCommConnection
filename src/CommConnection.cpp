@@ -13,7 +13,7 @@ void CommConnection::performReads() {
 	        cv.notify_one();
 	    } else if(bytesRead < 0 && blockingTime < 0) {
 			failedRead();
-		} else if(blockingTime != 0) {
+		} else if(blockingTime > 0) {
             std::this_thread::sleep_for(std::chrono::milliseconds(blockingTime));
         }
 	}
