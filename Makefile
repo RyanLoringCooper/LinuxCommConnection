@@ -1,6 +1,6 @@
 CXX				= g++
 LIBS			= -lpthread
-CXXFLAGS		= -Wall -O2 -std=c++11
+CXXFLAGS		= -Wall -O2 -std=c++11 -g
 SRC_SUFFIX		= .cpp
 PRG_SUFFIX		= .bin
 TEST_SUFFIX		= .test
@@ -29,7 +29,7 @@ tests: $(TEST_BINS)
 
 %$(TEST_SUFFIX): $(TEST_OBJS) $(SRC_OBJS) 
 	@mkdir -p $(BUILD_DIR)
-	$(CXX) $(CXXFLAGS) -g -o $(BUILD_DIR)$(BIN:$(TEST_SUFFIX)=) $(patsubst %.o, $(OBJ_DIR)%.o, $(patsubst %$(TEST_SUFFIX), %.o, $@)) $(patsubst %.o, $(OBJ_DIR)%.o, $(SRC_OBJS)) $(LIBS)
+	$(CXX) $(CXXFLAGS) -o $(BUILD_DIR)$(BIN:$(TEST_SUFFIX)=) $(patsubst %.o, $(OBJ_DIR)%.o, $(patsubst %$(TEST_SUFFIX), %.o, $@)) $(patsubst %.o, $(OBJ_DIR)%.o, $(SRC_OBJS)) $(LIBS)
 
 clean:
 	$(RM) -rf $(BUILD_DIR)

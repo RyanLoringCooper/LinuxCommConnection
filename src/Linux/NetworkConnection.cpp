@@ -1,18 +1,17 @@
 #include "../NetworkConnection.h"
 
 // protected
-
 bool NetworkConnection::setupServer(const int &port) {
 	bzero((char *) &mAddr, sizeof(struct sockaddr_in));
 	mAddr.sin_family = AF_INET;
 	mAddr.sin_addr.s_addr = htonl(INADDR_ANY);
 	mAddr.sin_port = htons(port);
 	mSocket = socket(mAddr.sin_family, connectionType, 0);
-	if (mSocket < 0) {
+	if(mSocket < 0) {
 		fprintf(stderr, "ERROR opening socket: %d\n", errno);
 		return false;
 	}
-	if (bind(mSocket, (struct sockaddr *) &mAddr, sizeof(mAddr)) < 0) {
+	if(bind(mSocket, (struct sockaddr *) &mAddr, sizeof(mAddr)) < 0) {
 		fprintf(stderr, "ERROR on binding to port %d. Is it already taken?\n", port);
 		return false;
 	} 
@@ -22,6 +21,25 @@ bool NetworkConnection::setupServer(const int &port) {
 		// UDP connection
 		connected = true;
 		printf("Successfully setup socket server.\n");
+		return true;
+	}
+}
+
+bool NetworkConnection::waitForClientConnection() {
+	listen(mSocket,5);
+	printf("Waiting for client connection...\n");
+	// accept a client socket
+	clientSocket = accept(mSocket, (struct sockaddr *) NULL, NULL);
+	if (clientSocket < 0) {
+		fprintf(stderr, "Accepting a connection failed with errno %d\n", errno);
+		close(mSocket);
+		return false;
+	} else {
+        if(blockingTime >= 0) {
+            fcntl(clientSocket, F_SETFL, fcntl(clientSocket, F_GETFL) | O_NONBLOCK);
+        }
+		printf("IPv4 client connected!\n");
+		connected = true;
 		return true;
 	}
 }
@@ -58,27 +76,6 @@ bool NetworkConnection::connectToServer() {
 	printf("Connected to server.\n");
 	connected = true;
     return true;
-}
-
-bool NetworkConnection::waitForClientConnection() {
-	bzero((char *) &mAddr, sizeof(mAddr));
-	socklen_t connLen = sizeof(mAddr);
-	listen(mSocket,5);
-	printf("Waiting for client connection...\n");
-	// accept a client socket
-	clientSocket = accept(mSocket, (struct sockaddr *) &mAddr, &connLen);
-	if (clientSocket < 0) {
-		fprintf(stderr, "Accepting a connection failed with errno %d\n", errno);
-		close(mSocket);
-		return false;
-	} else {
-        if(blockingTime >= 0) {
-            fcntl(clientSocket, F_SETFL, fcntl(clientSocket, F_GETFL) | O_NONBLOCK);
-        }
-		printf("IPv4 client connected!\n");
-		connected = true;
-		return true;
-	}
 }
 
 void NetworkConnection::failedRead() {
