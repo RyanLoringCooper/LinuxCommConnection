@@ -14,7 +14,7 @@ BINS			= $(patsubst %, %$(PRG_SUFFIX), $(PRGS))
 TEST_BINS		= $(patsubst %, %$(TEST_SUFFIX), $(TEST_PRGS))
 OBJ_DIR			= obj/
 BUILD_DIR		= bin/
-VPATH			= tests src src/impls
+VPATH			= tests src src/impls obj
 
 .SECONDEXPANSION:
 BIN = $@
