@@ -1,8 +1,6 @@
 #include <iostream>
-#include <unistd.h>
 #include <sys/types.h> 
 #include <sys/socket.h>
-#include <sys/wait.h>
 #include <thread>
 #include <chrono>
 #include <string>
@@ -23,88 +21,34 @@ const std::string helpText("Usage:\n\tNetworkConnectionTest [-h] [-d <delay_time
         "<port> = A number from 1-65535 which is the port to connect on\n"
         );
 
-void server(const int &connectionType, const int &port, const int &delayTime) {
-    char recvBuff[BUFF_SIZE];
-    memset(&recvBuff[0], 0, BUFF_SIZE);
-    NetworkConnection server = NetworkConnection(port, connectionType, "", delayTime, true);
-    server.begin();
-    for(int i = 0; i < 3; i++) {
-        std::cout << "server" << i << std::endl;
-        server.waitForData();
-        server.read(recvBuff, server.available());
-        std::cout << "Server got: " << recvBuff << std::endl;
-        if(strcmp(recvBuff, endingMessage.c_str()) == 0) {
-            server.terminate();
+void connectionLoop(NetworkConnection *con, const std::string &conIdentifier) {
+    char buff[BUFF_SIZE];
+    int avail;
+    for(int i = 0; i < 10; i++) {
+        con->write(message);
+        std::cout << conIdentifier << " sent: " << message << std::endl;
+        avail = con->waitForData();
+        con->read(buff, avail);
+        std::cout << conIdentifier << " recv: " << buff << std::endl;
+        if(strcmp(buff, endingMessage.c_str()) == 0) {
             break;
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        memset(&recvBuff[0], 0, BUFF_SIZE);
-        server.write(message);
-        std::cout << "server wrote\n";
+        memset(buff, 0, avail);
     }
-    std::cout << "server quit\n";
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    server.write(endingMessage);
-    server.terminate();
+    con->write(endingMessage);
+    con->terminate();
+}
+
+void server(const int &connectionType, const int &port, const int &delayTime) {
+    NetworkConnection server = NetworkConnection(port, connectionType, "", delayTime, true);
+    server.begin();
+    connectionLoop(&server, std::string("server"));
 }
 
 void client(const int &connectionType, const int &port, const int &delayTime) {
-    char recvBuff[BUFF_SIZE];
-    memset(&recvBuff[0], 0, BUFF_SIZE);
     NetworkConnection client = NetworkConnection(port, connectionType, "127.0.0.1", delayTime);
     client.begin();
-    std::this_thread::sleep_for(std::chrono::seconds(5));
-    for(int i = 0; i < 3; i++) {
-        std::cout << "client" << i << std::endl;
-        client.write(message);
-        std::cout << "client wrote\n";
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        client.waitForData();
-        client.read(recvBuff, client.available());
-        std::cout << "Client got: " << recvBuff << std::endl;
-        if(strcmp(recvBuff, endingMessage.c_str()) == 0) {
-            client.terminate();
-            break;
-        }
-    }
-    std::cout << "client quit\n";
-    client.write(endingMessage);
-    client.terminate();
-}
-
-void runTest(const int &connectionType, const int &delayTime) {
-    if(fork() == 0) {
-        // child code
-        server(connectionType, 12345, delayTime);
-    } else {
-        // parent code
-        client(connectionType, 12345, delayTime);
-        int status;
-        waitpid(-1, &status, 0);
-    }
-}
-
-
-int testRun() {
-    int connectionTypes[] = {SOCK_STREAM, SOCK_DGRAM};
-    int delay[] = {100, 10, 1, 0, -1};
-
-    for(int i = 0; i < 5; i++) {
-        for(int j = 0; j < 2; j++) {
-            if(fork() == 0) {
-                int connectionType = connectionTypes[j];
-                std::cout << "\nTesting " 
-                    << (SOCK_STREAM == connectionType ? "SOCK_STREAM" : "SOCK_DGRAM") 
-                    << " with " << delay[i] << "ms timeout on reads" << std::endl;
-                runTest(connectionType, delay[i]);
-                return 0;
-            }
-            int status;
-            waitpid(-1, &status, 0);
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        }
-    }
-	return 0;
+    connectionLoop(&client, std::string("client"));
 }
 
 int main(int argc, char *argv[]) {
