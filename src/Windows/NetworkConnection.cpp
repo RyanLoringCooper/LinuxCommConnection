@@ -36,6 +36,7 @@ bool NetworkConnection::setupServer(const int &port) {
         WSACleanup();
         return false;
     }   
+    setBlocking(blockingTime);
     // Setup the TCP listening socket
     iResult = bind(mSocket, connAddr->ai_addr, (int)connAddr->ai_addrlen);
     if (iResult == SOCKET_ERROR) {
@@ -83,6 +84,7 @@ bool NetworkConnection::setupClient(const char *ipaddr, const int &port) {
         WSACleanup();
         return 1;
     }
+    setBlocking(blockingTime);
     return connectToServer();
 }
 
