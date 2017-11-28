@@ -30,7 +30,7 @@ bool NetworkConnection::waitForClientConnection() {
 	listen(mSocket,5);
 	printf("Waiting for client connection...\n");
 	// accept a client socket
-	while(go) {
+	while(interruptRead) {
 		clientSocket = accept(mSocket, (struct sockaddr *) NULL, NULL);
 		if(errno != EWOULDBLOCK && errno != EAGAIN) {
 			if (clientSocket < 0) {
