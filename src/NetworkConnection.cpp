@@ -19,7 +19,6 @@ NetworkConnection::NetworkConnection(const int &port, const int &connectionType,
 			fprintf(stderr, "Could not setup socket client connection to %s:%d", ipaddr, port);
 		}
 	}
-    setBlocking(blockingTime);
 }
 
 NetworkConnection::~NetworkConnection() {
