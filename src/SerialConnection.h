@@ -37,7 +37,7 @@ protected:
 	void exitGracefully();
     bool setBlocking(const int &blockingTime = -1);
 public:
-	SerialConnection(char *portName, const int &speed, const int &parity, const int &blockingTime = -1, const bool &debug = false, const bool &noReads = false);
+	SerialConnection(const char *portName, const int &speed, const int &parity, const int &blockingTime = -1, const bool &debug = false, const bool &noReads = false);
 	~SerialConnection();
     using CommConnection::write;
 	
