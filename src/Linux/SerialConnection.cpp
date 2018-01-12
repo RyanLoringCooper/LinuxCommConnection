@@ -95,6 +95,22 @@ SerialConnection::SerialConnection(const char *portName, const int &speed, const
 	connected = true;
 }
 
+SerialConnection::SerialConnection(const SerialConnection &other) : CommConnection(other) {
+    if(this == &other) {
+        return;
+    }
+    *this = other;
+}
+
+SerialConnection &SerialConnection::operator=(const SerialConnection &other) {
+    if(this == &other) {
+        return *this;
+    }
+    ser = other.ser;
+    CommConnection::operator=(other);
+    return *this;
+}
+
 bool SerialConnection::write(const char *buff, const int &buffSize) {
 	if(!connected) 
 		return false;

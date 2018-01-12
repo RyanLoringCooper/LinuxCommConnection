@@ -41,7 +41,6 @@ void SerialConnection::exitGracefully() {
 }
 
 // public:
-
 SerialConnection::SerialConnection(const char *portName, const int &blockingTime, const bool &debug, const bool &noReads) : CommConnection(blockingTime, debug, noReads) {
     handler = CreateFileA(static_cast<LPCSTR>(portName),
         GENERIC_READ | GENERIC_WRITE,
@@ -77,6 +76,22 @@ SerialConnection::SerialConnection(const char *portName, const int &blockingTime
             }
         }
     }
+}
+
+SerialConnection::SerialConnection(const SerialConnection &other) : CommConnection(other) {
+    if(this == &other) {
+        return;
+    }
+    *this = other;
+}
+
+SerialConnection &SerialConnection::operator=(const SerialConnection &other) {
+    if(this == &other) {
+        return *this;
+    }
+    handler = other.handler;
+    CommConnection::operator=(other);
+    return *this;
 }
 
 bool SerialConnection::write(const char *buff, const int &buffSize) {

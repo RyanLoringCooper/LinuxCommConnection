@@ -33,6 +33,8 @@ protected:
     virtual bool setBlocking(const int &blockingTime = -1) = 0;
 public:
 	CommConnection(const int &blockingTime = -1, const bool &debug = false, const bool &noReads = false);
+    CommConnection(const CommConnection &other);
+    CommConnection &operator=(const CommConnection &other);
 
 	bool begin();
 	int available() const;

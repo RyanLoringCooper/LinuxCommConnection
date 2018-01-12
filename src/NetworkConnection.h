@@ -29,35 +29,36 @@
 #include "CommConnection.h"
 
 class NetworkConnection : public CommConnection {
-protected:
+    protected:
 #if defined(__linux__) || defined(__linux) || defined(linux) 
-	int mSocket, clientSocket;
-	struct sockaddr_in mAddr, rAddr;
+        int mSocket, clientSocket;
+        struct sockaddr_in mAddr, rAddr;
 #elif defined(_WIN32)
-	SOCKET mSocket, clientSocket;
-    struct addrinfo *result;
+        SOCKET mSocket, clientSocket;
+        struct addrinfo *result;
 #else
 #error Unsupported os
 #endif
-	int connectionType;
-    bool server;
+        int connectionType;
+        bool server;
 
-	bool setupServer(const int &port);
-	bool setupClient(const char *ipaddr, const int &port);
-	bool waitForClientConnection();
-	bool connectToServer();
+        bool setupServer(const int &port);
+        bool setupClient(const char *ipaddr, const int &port);
+        bool waitForClientConnection();
+        bool connectToServer();
 
-	void failedRead();
-	int getData(char *buff, const int &buffSize);
-	void exitGracefully();
-    bool setBlocking(const int &blockingTime = -1);
-public:
-	NetworkConnection(const int &port, const int &connectionType = SOCK_STREAM, const char *ipaddr = "", const int &blockingTime = -1, const bool &debug = false, const bool &noReads = false);
-	NetworkConnection(const NetworkConnection &other);
-	~NetworkConnection();
-    using CommConnection::write;
-	
-	bool write(const char *buff, const int &buffSize);
+        void failedRead();
+        int getData(char *buff, const int &buffSize);
+        void exitGracefully();
+        bool setBlocking(const int &blockingTime = -1);
+    public:
+        NetworkConnection(const int &port, const int &connectionType = SOCK_STREAM, const char *ipaddr = "", const int &blockingTime = -1, const bool &debug = false, const bool &noReads = false);
+        NetworkConnection(const NetworkConnection &other);
+        ~NetworkConnection();
+        NetworkConnection &operator=(const NetworkConnection &other);
+        using CommConnection::write;
+
+        bool write(const char *buff, const int &buffSize);
 };
 
 #endif 

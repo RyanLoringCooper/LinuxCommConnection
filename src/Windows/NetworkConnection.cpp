@@ -157,6 +157,24 @@ void NetworkConnection::failedRead() {
 }
 
 // public 
+NetworkConnection::NetworkConnection(const NetworkConnection &other) : CommConnection(other) {
+    if(this == &other) {
+        return;
+    }   
+    *this = other;
+}
+
+NetworkConnection &NetworkConnection::operator=(const NetworkConnection &other) {
+    if(this == &other) {
+        return *this;
+    }   
+    mSocket = other.mSocket;
+    clientSocket = other.clientSocket;
+    memcpy(result, other.result, sizeof(addrinfo));
+    CommConnection::operator=(other);
+    return *this;
+}
+
 bool NetworkConnection::write(const char *buff, const int &buffSize) { 
 	if(!connected) 
 		return false;

@@ -38,6 +38,8 @@ protected:
     bool setBlocking(const int &blockingTime = -1);
 public:
 	SerialConnection(const char *portName, const int &speed, const int &parity, const int &blockingTime = -1, const bool &debug = false, const bool &noReads = false);
+    SerialConnection(const SerialConnection &other);
+    SerialConnection &operator=(const SerialConnection &other);
 	~SerialConnection();
     using CommConnection::write;
 	

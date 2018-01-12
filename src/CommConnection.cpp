@@ -56,6 +56,35 @@ CommConnection::CommConnection(const int &blockingTime, const bool &debug, const
 	writeIndex = 0;	
 }
 
+CommConnection::CommConnection(const CommConnection &other) {
+    if(this == &other) {
+        return;
+    }
+    *this = other;
+}
+
+CommConnection &CommConnection::operator=(const CommConnection &other) {
+    if(this == &other) {
+        return *this;
+    }
+    buffer = new char[BUFFER_SIZE+1];
+    memcpy(buffer, other.buffer, BUFFER_SIZE+1);
+    readIndex = other.readIndex;
+    writeIndex = other.writeIndex;
+    blockingTime = other.blockingTime;
+    connected = other.connected;
+    interruptRead = other.interruptRead;
+    noReads = other.noReads;
+    begun = other.begun;
+    terminated = other.terminated;
+    cvBool = other.cvBool;
+    debug = other.debug;
+    if(begun && connected) {
+        begin();
+    }
+    return *this;
+}
+
 bool CommConnection::begin() {
 	if(connected) {
 		begun = true;
