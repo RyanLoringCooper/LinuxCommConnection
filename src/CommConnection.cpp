@@ -2,11 +2,11 @@
 #include <cstdio>
 
 void CommConnection::performReads() {
-	char buff[MAX_DATA_LENGTH];
-	memset(buff, 0, MAX_DATA_LENGTH);
+	char buff[_MAX_DATA_LENGTH];
+	memset(buff, 0, _MAX_DATA_LENGTH);
 	int bytesRead;
 	while(!interruptRead) {
-		bytesRead = getData(buff, MAX_DATA_LENGTH);
+		bytesRead = getData(buff, _MAX_DATA_LENGTH);
  	    if (bytesRead > 0) {
 	        fillBuffer(buff, bytesRead);
 	        cvBool = true;
@@ -21,12 +21,12 @@ void CommConnection::performReads() {
 
 void CommConnection::fillBuffer(char *buff, const int &bytesRead) {
 	int newWriteIndex = bytesRead+writeIndex;
-	if(newWriteIndex < BUFFER_SIZE) {
+	if(newWriteIndex < _BUFFER_SIZE) {
 		memcpy(&buffer[writeIndex], buff, bytesRead);
 		writeIndex = newWriteIndex;
 	} else {
-		int overflow = newWriteIndex-BUFFER_SIZE;
-		int underflow = BUFFER_SIZE-writeIndex;
+		int overflow = newWriteIndex-_BUFFER_SIZE;
+		int underflow = _BUFFER_SIZE-writeIndex;
 		memcpy(&buffer[writeIndex], buff, underflow);
 		memcpy(buffer, &buff[underflow], overflow);
 		writeIndex = overflow;
@@ -50,8 +50,8 @@ CommConnection::CommConnection(const int &blockingTime, const bool &debug, const
 	interruptRead = false;
 	terminated = false;
 	cvBool = false;
-	buffer = new char[BUFFER_SIZE+1];
-	memset(buffer, 0, BUFFER_SIZE+1);
+	buffer = new char[_BUFFER_SIZE+1];
+	memset(buffer, 0, _BUFFER_SIZE+1);
 	readIndex = 0;
 	writeIndex = 0;	
 }
@@ -67,8 +67,8 @@ CommConnection &CommConnection::operator=(const CommConnection &other) {
     if(this == &other) {
         return *this;
     }
-    buffer = new char[BUFFER_SIZE+1];
-    memcpy(buffer, other.buffer, BUFFER_SIZE+1);
+    buffer = new char[_BUFFER_SIZE+1];
+    memcpy(buffer, other.buffer, _BUFFER_SIZE+1);
     readIndex = other.readIndex;
     writeIndex = other.writeIndex;
     blockingTime = other.blockingTime;
@@ -100,7 +100,7 @@ bool CommConnection::begin() {
 int CommConnection::available() const {
 	int retval = writeIndex-readIndex;
 	if(retval < 0) 
-		retval = writeIndex+BUFFER_SIZE-readIndex;
+		retval = writeIndex+_BUFFER_SIZE-readIndex;
 	return retval;
 }
 
@@ -118,26 +118,32 @@ int CommConnection::waitForData() {
 }
 
 char CommConnection::read() {
-	if (readIndex + 1 < BUFFER_SIZE) {
-		return buffer[readIndex++];
+	if(available() > 0) {
+		if (readIndex + 1 < _BUFFER_SIZE) {
+			return buffer[readIndex++];
+		} else {
+			char retval = buffer[readIndex];
+			readIndex = 0;
+			return retval;
+		}
 	} else {
-		char retval = buffer[readIndex];
-		readIndex = 0;
-		return retval;
+		return 0;
 	}
 }
 
 void CommConnection::read(char *buff, const unsigned int &bytesToRead) {
-	int newReadIndex = readIndex+bytesToRead;
-	if(newReadIndex < BUFFER_SIZE) {
-		memcpy(buff, &buffer[readIndex], bytesToRead);
-		readIndex = newReadIndex;
-	} else {
-		int overflow = newReadIndex-BUFFER_SIZE;
-		int underflow = BUFFER_SIZE-readIndex;
-		memcpy(buff, &buffer[readIndex], underflow);
-		memcpy(&buff[underflow], buffer, overflow);
-		readIndex = overflow;
+	if(bytesToRead <= available()) {
+		int newReadIndex = readIndex+bytesToRead;
+		if(newReadIndex < _BUFFER_SIZE) {
+			memcpy(buff, &buffer[readIndex], bytesToRead);
+			readIndex = newReadIndex;
+		} else {
+			int overflow = newReadIndex-_BUFFER_SIZE;
+			int underflow = _BUFFER_SIZE-readIndex;
+			memcpy(buff, &buffer[readIndex], underflow);
+			memcpy(&buff[underflow], buffer, overflow);
+			readIndex = overflow;
+		}
 	}
 }
 
@@ -150,7 +156,7 @@ int CommConnection::readUntil(char *buff, const int &buffSize, const char &delim
 				memcpy(&buff[leftOff], &buffer[readIndex], i-readIndex);
 				readIndex = i+1;
 				return count;
-			} else if(i == BUFFER_SIZE) {
+			} else if(i == _BUFFER_SIZE) {
 				memcpy(&buff[leftOff], &buffer[readIndex], i-readIndex);
 				leftOff = i-readIndex;
 				readIndex = 0;
@@ -168,13 +174,17 @@ int CommConnection::readUntil(char *buff, const int &buffSize, const char &delim
 
 std::string CommConnection::readString(const unsigned int &bytesToRead) {
     int goingToRead = bytesToRead;
-    if(goingToRead == -1) {
+    if(goingToRead < 0) {
         goingToRead = available();
     }
-    char buff[goingToRead];
-    memset(buff, 0, goingToRead);
-    read(buff, goingToRead);
-    return std::string(buff);
+	if(goingToRead <= available()) {
+	    char buff[goingToRead];
+	    memset(buff, 0, goingToRead);
+	    read(buff, goingToRead);
+	    return std::string(buff);
+	} else {
+		return std::string("");
+	}
 }
 
 bool CommConnection::isConnected() const {
