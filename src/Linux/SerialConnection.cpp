@@ -114,5 +114,5 @@ SerialConnection &SerialConnection::operator=(const SerialConnection &other) {
 bool SerialConnection::write(const char *buff, const int &buffSize) {
 	if(!connected) 
 		return false;
-	return (bool) ::write(ser, buff, buffSize);
+	return ::write(ser, buff, buffSize) != -1;
 }
