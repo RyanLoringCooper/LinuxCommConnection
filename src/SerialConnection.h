@@ -27,7 +27,7 @@ protected:
 	int set_interface_attribs (const int &speed, const int &parity); 
 	int set_blocking (const bool &should_block);
 #elif defined(_WIN32)
-    HANDLE handler;    
+	HANDLE handler;    
 #else
 #error Unsupported os
 #endif
@@ -35,14 +35,14 @@ protected:
 	void failedRead();
 	int getData(char *buff, const int &buffSize);
 	void exitGracefully();
-    bool setBlocking(const int &blockingTime = -1);
+	bool setBlocking(const int &blockingTime = -1);
 public:
 	SerialConnection(const char *portName, const int &speed, const int &parity, const int &blockingTime = -1, const bool &debug = false, const bool &noReads = false);
-    SerialConnection(const SerialConnection &other);
-    SerialConnection &operator=(const SerialConnection &other);
+	SerialConnection(const SerialConnection &other);
+	SerialConnection &operator=(const SerialConnection &other);
 	~SerialConnection();
-    using CommConnection::write;
-	
+	using CommConnection::write;
+	// returns false and sets errno upon error
 	bool write(const char *buff, const int &buffSize);
 };
 

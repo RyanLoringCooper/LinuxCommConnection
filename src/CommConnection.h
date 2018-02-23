@@ -54,7 +54,7 @@ protected:
 	// attempts to stop readThread and destroy it
 	void closeThread();
 
-	// a child class may attempt to restart the connection with this function
+	// a child class may attempt to restart the connection with this function as it is called when getData failes
 	virtual void failedRead() = 0;
 	// the function that the child class implements to do the reading of the data from the connection
 	virtual int getData(char *buff, const int &buffSize) = 0;

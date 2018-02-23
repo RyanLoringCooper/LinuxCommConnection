@@ -111,6 +111,7 @@ SerialConnection &SerialConnection::operator=(const SerialConnection &other) {
     return *this;
 }
 
+// Sets errno when it returns false, indicating there was an error with writting
 bool SerialConnection::write(const char *buff, const int &buffSize) {
 	if(!connected) 
 		return false;
