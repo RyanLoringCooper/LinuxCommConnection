@@ -4,7 +4,7 @@ This library was made to simplify the use of TCP, UDP, and serial devices. It is
 
 Classes from the library can be initialized like this:
 ```
-SerialConnection con("/dev/ttyUSB0", B57600);
+SerialConnection con("/dev/ttyUSB0", B57600, 0);
 NetworkConnection tcpClient(54321, SOCK_STREAM, "192.168.1.100");
 NetworkConnection tcpServer(54321);
 NetworkConnection udpClient(12345, SOCK_DGRAM, "10.0.0.100");
