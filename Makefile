@@ -29,7 +29,7 @@ lib: $(SRC_OBJS)
 	@echo Building lib
 	@mkdir -p $(BUILD_DIR)$(LIB_TARGET)/lib
 	@mkdir -p $(BUILD_DIR)$(LIB_TARGET)/include
-	ar rcs $(BUILD_DIR)$(LIB_TARGET)/lib/$(LIB_TARGET).a $(patsubst %.o, $(OBJ_DIR)%.o, $(SRC_OBJS))
+	ar rcs $(BUILD_DIR)$(LIB_TARGET)/lib/lib$(LIB_TARGET).so $(patsubst %.o, $(OBJ_DIR)%.o, $(SRC_OBJS))
 	@cp $(HEADERS) $(BUILD_DIR)$(LIB_TARGET)/include
 	@echo Create lib
 	@echo
