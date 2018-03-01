@@ -97,8 +97,8 @@ bool CommConnection::begin() {
 	}
 }
 
-int CommConnection::available() const {
-	int retval = writeIndex-readIndex;
+unsigned int CommConnection::available() const {
+	unsigned int retval = writeIndex-readIndex;
 	if(retval < 0) 
 		retval = writeIndex+_BUFFER_SIZE-readIndex;
 	return retval;
@@ -173,7 +173,7 @@ int CommConnection::readUntil(char *buff, const int &buffSize, const char &delim
 }
 
 std::string CommConnection::readString(const unsigned int &bytesToRead) {
-    int goingToRead = bytesToRead;
+    unsigned int goingToRead = bytesToRead;
     if(goingToRead < 0) {
         goingToRead = available();
     }

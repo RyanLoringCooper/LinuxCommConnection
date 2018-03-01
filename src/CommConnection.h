@@ -71,7 +71,7 @@ public:
     // starts the readThread
 	bool begin();
 	// returns how many bytes are available to be read from the buffer immediately
-	int available() const;
+	unsigned int available() const;
 	// blocks until there is a byte to be read from the buffer
 	int waitForData();
 	// returns 1 byte from the buffer if one is available and moves readIndex up by 1
