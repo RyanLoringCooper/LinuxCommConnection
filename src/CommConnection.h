@@ -87,7 +87,7 @@ public:
 	// returns a string with bytesToRead number of characters if that many bytes can be read
 	// if no argument is provided to this function, the string that is returned has all the bytes that are in buffer
 	// it will move readIndex up by the number of bytes it put into the string
-    std::string readString(const unsigned int &bytesToRead = -1);
+    std::string readString(const unsigned int &bytesToRead = 0);
     // returns connected
 	bool isConnected() const;
 	// sets readIndex = writeIndex

@@ -174,12 +174,12 @@ int CommConnection::readUntil(char *buff, const int &buffSize, const char &delim
 
 std::string CommConnection::readString(const unsigned int &bytesToRead) {
     unsigned int goingToRead = bytesToRead;
-    if(goingToRead < 0) {
+    if(goingToRead == 0) {
         goingToRead = available();
     }
 	if(goingToRead <= available()) {
-	    char buff[goingToRead];
-	    memset(buff, 0, goingToRead);
+	    char buff[goingToRead+1];
+	    memset(buff, 0, goingToRead+1);
 	    read(buff, goingToRead);
 	    return std::string(buff);
 	} else {
