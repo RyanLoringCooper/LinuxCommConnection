@@ -21,18 +21,31 @@ VPATH			= tests src src/impls obj
 .SECONDEXPANSION:
 BIN = $@
 
-all: tests | lib
+.PHONY: all
+all: tests | lib archive 
 
 .PHONY: lib
-lib: $(SRC_OBJS)
-	@echo
-	@echo Building lib
+lib: $(SRC_OBJS) copyHeaders
 	@mkdir -p $(BUILD_DIR)$(LIB_TARGET)/lib
-	@mkdir -p $(BUILD_DIR)$(LIB_TARGET)/include
-	ar rcs $(BUILD_DIR)$(LIB_TARGET)/lib/lib$(LIB_TARGET).so $(patsubst %.o, $(OBJ_DIR)%.o, $(SRC_OBJS))
-	@cp $(HEADERS) $(BUILD_DIR)$(LIB_TARGET)/include
-	@echo Create lib
 	@echo
+	@echo Building shared object
+	$(CXX) $(CXXFLAGS) -shared -o $(BUILD_DIR)$(LIB_TARGET)/lib/lib$(LIB_TARGET).so $(patsubst %.o, $(OBJ_DIR)%.o, $(SRC_OBJS)) $(LIBS)
+	@echo Created shared object
+	@echo
+
+.PHONY: archive
+archive: $(SRC_OBJS) copyHeaders
+	@mkdir -p $(BUILD_DIR)
+	@echo
+	@echo Building archived lib
+	ar rcs $(BUILD_DIR)$(LIB_TARGET)/lib/$(LIB_TARGET).a $(patsubst %.o, $(OBJ_DIR)%.o, $(SRC_OBJS))
+	@echo Created archived lib 
+	@echo
+
+.PHONY: copyHeaders
+copyHeaders:
+	@mkdir -p $(BUILD_DIR)/$(LIB_TARGET)/include/$(LIB_TARGET)
+	@cp $(HEADERS) $(BUILD_DIR)/$(LIB_TARGET)/include/$(LIB_TARGET)/
 
 .PHONY: tests
 tests: $(TEST_BINS)
@@ -48,4 +61,4 @@ clean:
 
 %.o : %$(SRC_SUFFIX)
 	@mkdir -p $(OBJ_DIR)
-	$(CXX) $(CXXFLAGS) -c -o $(OBJ_DIR)$@ $< $(LIBS)
+	$(CXX) $(CXXFLAGS) -c -fPIC $< -o $(OBJ_DIR)$@ $(LIBS)
