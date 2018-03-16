@@ -1,21 +1,47 @@
 #include "CommConnection.h"
 #include <cstdio>
 
+void printReadInformation(const int &bytesRead, const char *buff) {
+	fprintf(stderr, "bytesRead:%d ", bytesRead);
+	for(int i = 0 ; i < bytesRead; i++) {
+		fprintf(stderr, "%c", buff[i]);
+	}
+	fprintf(stderr, "\n");
+}
+
+void printBuffer(const char *buffer) {
+	fprintf(stderr, "buffer:");
+	for(int i = 0; i < _BUFFER_SIZE; i++) {
+		if(buffer[i] < 32 || buffer[i] > 126) {
+			fprintf(stderr, "%02x", buffer[i]);
+		} else {
+			fprintf(stderr, "%c", buffer[i]);
+		}
+	}
+	fprintf(stderr, "\n");
+}
+
 void CommConnection::performReads() {
 	char buff[_MAX_DATA_LENGTH];
 	memset(buff, 0, _MAX_DATA_LENGTH);
 	int bytesRead;
 	while(!interruptRead) {
 		bytesRead = getData(buff, _MAX_DATA_LENGTH);
- 	    if (bytesRead > 0) {
-	        fillBuffer(buff, bytesRead);
-	        cvBool = true;
-	        cv.notify_one();
-	    } else if(bytesRead < 0 && blockingTime < 0) {
+		if (bytesRead > 0) {
+			printReadInformation(bytesRead, buff);
+			fillBuffer(buff, bytesRead);
+			printBuffer(buffer);
+			cvBool = true;
+			try {
+				cv.notify_one();
+			} catch (...) {
+				fprintf(stderr, "cv.notify_one() mutex lock failed\n");
+			}
+		} else if(bytesRead < 0 && blockingTime < 0) {
 			failedRead();
 		} else if(blockingTime > 0) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(blockingTime));
-        }
+			std::this_thread::sleep_for(std::chrono::milliseconds(blockingTime));
+		}
 	}
 }
 
@@ -25,6 +51,7 @@ void CommConnection::fillBuffer(char *buff, const int &bytesRead) {
 		memcpy(&buffer[writeIndex], buff, bytesRead);
 		writeIndex = newWriteIndex;
 	} else {
+		fprintf(stderr, "Handling wrap around\n");
 		int overflow = newWriteIndex-_BUFFER_SIZE;
 		int underflow = _BUFFER_SIZE-writeIndex;
 		memcpy(&buffer[writeIndex], buff, underflow);
@@ -43,8 +70,8 @@ void CommConnection::closeThread() {
 }
 
 CommConnection::CommConnection(const int &blockingTime, const bool &debug, const bool &noReads) {
-    this->blockingTime = blockingTime;
-    this->debug = debug;
+	this->blockingTime = blockingTime;
+	this->debug = debug;
 	this->noReads = noReads;
 	connected = false;
 	interruptRead = false;
@@ -57,32 +84,32 @@ CommConnection::CommConnection(const int &blockingTime, const bool &debug, const
 }
 
 CommConnection::CommConnection(const CommConnection &other) {
-    if(this == &other) {
-        return;
-    }
-    *this = other;
+	if(this == &other) {
+		return;
+	}
+	*this = other;
 }
 
 CommConnection &CommConnection::operator=(const CommConnection &other) {
-    if(this == &other) {
-        return *this;
-    }
-    buffer = new char[_BUFFER_SIZE+1];
-    memcpy(buffer, other.buffer, _BUFFER_SIZE+1);
-    readIndex = other.readIndex;
-    writeIndex = other.writeIndex;
-    blockingTime = other.blockingTime;
-    connected = other.connected;
-    interruptRead = other.interruptRead;
-    noReads = other.noReads;
-    begun = other.begun;
-    terminated = other.terminated;
-    cvBool = other.cvBool;
-    debug = other.debug;
-    if(begun && connected) {
-        begin();
-    }
-    return *this;
+	if(this == &other) {
+		return *this;
+	}
+	buffer = new char[_BUFFER_SIZE+1];
+	memcpy(buffer, other.buffer, _BUFFER_SIZE+1);
+	readIndex = other.readIndex;
+	writeIndex = other.writeIndex;
+	blockingTime = other.blockingTime;
+	connected = other.connected;
+	interruptRead = other.interruptRead;
+	noReads = other.noReads;
+	begun = other.begun;
+	terminated = other.terminated;
+	cvBool = other.cvBool;
+	debug = other.debug;
+	if(begun && connected) {
+		begin();
+	}
+	return *this;
 }
 
 bool CommConnection::begin() {
@@ -97,8 +124,8 @@ bool CommConnection::begin() {
 	}
 }
 
-unsigned int CommConnection::available() const {
-	unsigned int retval = writeIndex-readIndex;
+long long CommConnection::available() const {
+	long long retval = writeIndex-readIndex;
 	if(retval < 0) 
 		retval = writeIndex+_BUFFER_SIZE-readIndex;
 	return retval;
@@ -107,13 +134,13 @@ unsigned int CommConnection::available() const {
 int CommConnection::waitForData() {
 	std::unique_lock<std::mutex> lk(dataMutex);
 	cv.wait(lk, [this]{
-        if(this->cvBool) {
-            this->cvBool = false;
-            return true;
-        } else {
-            return false;
-        }
-    });
+			if(this->cvBool) {
+			this->cvBool = false;
+			return true;
+			} else {
+			return false;
+			}
+			});
 	return available();
 }
 
@@ -131,7 +158,7 @@ char CommConnection::read() {
 	}
 }
 
-void CommConnection::read(char *buff, const unsigned int &bytesToRead) {
+void CommConnection::read(char *buff, const long long &bytesToRead) {
 	if(bytesToRead <= available()) {
 		int newReadIndex = readIndex+bytesToRead;
 		if(newReadIndex < _BUFFER_SIZE) {
@@ -172,16 +199,16 @@ int CommConnection::readUntil(char *buff, const int &buffSize, const char &delim
 	}
 }
 
-std::string CommConnection::readString(const unsigned int &bytesToRead) {
-    unsigned int goingToRead = bytesToRead;
-    if(goingToRead == 0) {
-        goingToRead = available();
-    }
+std::string CommConnection::readString(const long long &bytesToRead) {
+	long long goingToRead = bytesToRead;
+	if(goingToRead == 0) {
+		goingToRead = available();
+	}
 	if(goingToRead <= available()) {
-	    char buff[goingToRead+1];
-	    memset(buff, 0, goingToRead+1);
-	    read(buff, goingToRead);
-	    return std::string(buff);
+		char buff[goingToRead+1];
+		memset(buff, 0, goingToRead+1);
+		read(buff, goingToRead);
+		return std::string(buff);
 	} else {
 		return std::string("");
 	}
@@ -198,8 +225,8 @@ void CommConnection::clearBuffer() {
 void CommConnection::terminate() {
 	if(!terminated) {
 		terminated = true;
-        cvBool = true;
-        cv.notify_all();
+		cvBool = true;
+		cv.notify_all();
 		closeThread();
 		//delete[] buffer;
 		exitGracefully();
@@ -207,9 +234,9 @@ void CommConnection::terminate() {
 }
 
 bool CommConnection::write(const std::string &buff) {
-    return write(buff.c_str(), buff.length());
+	return write(buff.c_str(), buff.length());
 } 
 
 CommConnection::~CommConnection() {
-    terminate();
+	terminate();
 }

@@ -13,7 +13,8 @@
 #define _MAX_DATA_LENGTH 4096
 // size of the circular buffer that the user is served data from
 // 4194304 = 2^22 = 4MB
-#define _BUFFER_SIZE 4194304
+//#define _BUFFER_SIZE 4194304
+#define _BUFFER_SIZE 1024
 
 class CommConnection {
 protected:
@@ -71,7 +72,7 @@ public:
     // starts the readThread
 	bool begin();
 	// returns how many bytes are available to be read from the buffer immediately
-	unsigned int available() const;
+	long long available() const;
 	// blocks until there is a byte to be read from the buffer
 	int waitForData();
 	// returns 1 byte from the buffer if one is available and moves readIndex up by 1
@@ -79,7 +80,7 @@ public:
 	char read();
 	// fills buff with bytesToRead number of bytes and moves readIndex up by bytesToRead amount
 	// buff must be allocated by the caller and is left untouched if no bytes are available to be read
-	void read(char *buff, const unsigned int &bytesToRead);
+	void read(char *buff, const long long &bytesToRead);
 	// fills buff until either buffSize amount of bytes are read, or the character delim is read
 	// it will move readIndex up by the number of bytes it put into buff
 	// buff must be allocated by the caller
@@ -87,7 +88,7 @@ public:
 	// returns a string with bytesToRead number of characters if that many bytes can be read
 	// if no argument is provided to this function, the string that is returned has all the bytes that are in buffer
 	// it will move readIndex up by the number of bytes it put into the string
-    std::string readString(const unsigned int &bytesToRead = 0);
+    std::string readString(const long long &bytesToRead = 0);
     // returns connected
 	bool isConnected() const;
 	// sets readIndex = writeIndex
