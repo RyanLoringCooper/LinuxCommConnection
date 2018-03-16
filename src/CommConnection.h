@@ -99,7 +99,8 @@ public:
 	// fills buff until either buffSize amount of bytes are read, or the character delim is read
 	// it will move readIndex up by the number of bytes it put into buff
 	// buff must be allocated by the caller
-	int readUntil(char *buff, const int &buffSize, const char &delim);
+	// returns the number of bytes read
+	int readUntil(char *buff, const int &buffSize, const char &delim, const bool &includeDelim = false);
 	// returns a string with bytesToRead number of characters if that many bytes can be read
 	// if no argument is provided to this function, the string that is returned has all the bytes that are in buffer
 	// it will move readIndex up by the number of bytes it put into the string

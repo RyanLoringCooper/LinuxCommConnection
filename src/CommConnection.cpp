@@ -192,13 +192,18 @@ void CommConnection::read(char *buff, const long long &bytesToRead) {
 }
 
 // does not put the delim character in the buff 
-int CommConnection::readUntil(char *buff, const int &buffSize, const char &delim) { // TODO this needs work! Can't handle wrap around case
+int CommConnection::readUntil(char *buff, const int &buffSize, const char &delim, const bool &includeDelim) { // TODO this needs work! Can't handle wrap around case
 	int i = readIndex, count = 0, leftOff = 0;
 	while(true) {
 		if(available() > 0) {
 			if(buffer[i] == delim) {
+				if(includeDelim && i+1 < _BUFFER_SIZE && count+1 < buffSize) {
+					i++;
+					count++;
+				}
 				memcpy(&buff[leftOff], &buffer[readIndex], i-readIndex);
 				readIndex = i+1;
+				buff[buffSize-1] = '\0';
 				return count;
 			} else if(i == _BUFFER_SIZE) {
 				memcpy(&buff[leftOff], &buffer[readIndex], i-readIndex);
@@ -209,7 +214,9 @@ int CommConnection::readUntil(char *buff, const int &buffSize, const char &delim
 				i++;
 			}
 			count++;
-			if(count == buffSize) {
+			if(count == buffSize-1) {
+				memcpy(&buff[leftOff], &buffer[readIndex], i-readIndex);
+				buff[buffSize-1] = '\0';
 				return count;
 			}
 		}
