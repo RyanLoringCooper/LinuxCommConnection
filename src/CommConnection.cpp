@@ -45,9 +45,9 @@ void CommConnection::performReads() {
 	while(!interruptRead) {
 		bytesRead = getData(buff, _MAX_DATA_LENGTH);
 		if (bytesRead > 0) {
-			printReadInformation(bytesRead, buff);
+//			printReadInformation(bytesRead, buff);
 			fillBuffer(buff, bytesRead);
-			printBuffer(buffer);
+//			printBuffer(buffer);
 			cvBool = true;
 			try {
 				cv.notify_one();

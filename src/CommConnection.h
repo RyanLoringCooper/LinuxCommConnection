@@ -29,8 +29,7 @@
 #define _MAX_DATA_LENGTH 4096
 // size of the circular buffer that the user is served data from
 // 4194304 = 2^22 = 4MB
-//#define _BUFFER_SIZE 4194304
-#define _BUFFER_SIZE 1024
+#define _BUFFER_SIZE 4194304
 
 class CommConnection {
 protected:
