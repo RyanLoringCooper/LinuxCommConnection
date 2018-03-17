@@ -86,6 +86,22 @@ void CommConnection::closeThread() {
 	}
 }
 
+char *CommConnection::readRange(const int &start, const int &end) {
+    char *retval;
+    if(end < start) {
+        retval = new char[end+_BUFFER_SIZE-start+1];
+        memcpy(retval, &buffer[start], _BUFFER_SIZE-start);
+        memcpy(&retval[_BUFFER_SIZE-start], &buffer[0], end);
+        retval[end+_BUFFER_SIZE-start] = '\0';
+    } else {
+        retval = new char[end-start+1];
+        memcpy(retval, &buffer[start], end-start);
+        retval[end-start] = '\0';
+    }
+    readIndex = end+1;
+    return retval;
+}
+
 CommConnection::CommConnection(const int &blockingTime, const bool &debug, const bool &noReads) {
 	this->blockingTime = blockingTime;
 	this->debug = debug;
@@ -191,36 +207,40 @@ void CommConnection::read(char *buff, const long long &bytesToRead) {
 	}
 }
 
-// does not put the delim character in the buff 
-int CommConnection::readUntil(char *buff, const int &buffSize, const char &delim, const bool &includeDelim) { // TODO this needs work! Can't handle wrap around case
-	int i = readIndex, count = 0, leftOff = 0;
+int CommConnection::readUntil(char **buff, const char &delim, const long long &maxBytes, const bool &includeDelim) {
+	int i = readIndex, count = 0;
 	while(true) {
-		if(available() > 0) {
-			if(buffer[i] == delim) {
-				if(includeDelim && i+1 < _BUFFER_SIZE && count+1 < buffSize) {
-					i++;
-					count++;
-				}
-				memcpy(&buff[leftOff], &buffer[readIndex], i-readIndex);
-				readIndex = i+1;
-				buff[buffSize-1] = '\0';
-				return count;
-			} else if(i == _BUFFER_SIZE) {
-				memcpy(&buff[leftOff], &buffer[readIndex], i-readIndex);
-				leftOff = i-readIndex;
-				readIndex = 0;
-				i = 0;
-			} else {
-				i++;
-			}
-			count++;
-			if(count == buffSize-1) {
-				memcpy(&buff[leftOff], &buffer[readIndex], i-readIndex);
-				buff[buffSize-1] = '\0';
-				return count;
-			}
-		}
-	}
+        count++;
+        if(buffer[i] == delim) {
+            if(includeDelim) {
+                if(i == readIndex) {
+                    *buff = new char[2];
+                    (*buff)[0] = buffer[readIndex++];
+                    (*buff)[1] = '\0';
+                    return count;
+                } 
+                break;
+            } else {
+                if(i == readIndex) {
+                    *buff = NULL
+                    return 0;
+                }
+                count--;
+                i--;
+                break;
+            }
+        } else {
+            if((maxBytes > 0 && count == maxBytes) || i == writeIndex-1) {
+                break;
+            }
+            i++;
+            if(i == _BUFFER_SIZE) {
+                i = 0;
+            }
+        }
+    }
+    *buff = readRange(readIndex, i);
+    return count;
 }
 
 std::string CommConnection::readString(const long long &bytesToRead) {

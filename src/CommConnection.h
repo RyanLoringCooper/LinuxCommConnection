@@ -36,6 +36,7 @@ protected:
 	// a circular buffer that holds the data read from a connection until the user requests it
 	char *buffer;
 	// indexes related to buffer. The readIndex cannot pass the writeIndex.
+    // readIndex is the next index to be read, writeIndex is the next index to be written
 	int readIndex, writeIndex;
 	// the amount of time preformReads() will wait before trying to read again
 	// if less than 0, it will block indefinitely
@@ -70,6 +71,17 @@ protected:
 	// attempts to stop readThread and destroy it
 	void closeThread();
 
+    /* Reads the bytes between start and end in buffer
+     * If end is before start, it will wrap around the buffer
+     * this will also update readIndex
+     * @param start
+     *      the location to start reading from
+     * @param end
+     *      the location of the last byte to be put into the return value
+     * @retval a null terminated c string that contains the bytes in buffer between start and end
+     */
+    char *readRange(const int &start, const int &end); 
+
 	// a child class may attempt to restart the connection with this function as it is called when getData failes
 	virtual void failedRead() = 0;
 	// the function that the child class implements to do the reading of the data from the connection
@@ -96,11 +108,24 @@ public:
 	// fills buff with bytesToRead number of bytes and moves readIndex up by bytesToRead amount
 	// buff must be allocated by the caller and is left untouched if no bytes are available to be read
 	void read(char *buff, const long long &bytesToRead);
-	// fills buff until either buffSize amount of bytes are read, or the character delim is read
-	// it will move readIndex up by the number of bytes it put into buff
-	// buff must be allocated by the caller
-	// returns the number of bytes read
-	int readUntil(char *buff, const int &buffSize, const char &delim, const bool &includeDelim = false);
+
+	/* Reads until delim is read, until maxBytes is read, or there are no 
+     * more bytes to read from the buffer
+	 * @param buff
+     *      should be an unallocated reference to a char *
+     *      it will be allocated on the heap by this function 
+     *      and filled with the bytes read from buffer
+     *      it will also be null terminated
+     *      if buffer[readIndex] == delim, then buff will be a reference to NULL
+     * @param delim
+     *      the character to be read until
+     * @param maxBytes
+     *      if set to -1, this program will read until the delim is read or there are no more bytes to read
+     * @param includeDelim
+     *      determines whether the delim will be included in the buffer or not
+     * @retval the number of bytes put into buff not including the null terminator
+     */
+	int readUntil(char **buff, const char &delim, const long long &maxBytes = -1, const bool &includeDelim = false);
 	// returns a string with bytesToRead number of characters if that many bytes can be read
 	// if no argument is provided to this function, the string that is returned has all the bytes that are in buffer
 	// it will move readIndex up by the number of bytes it put into the string
