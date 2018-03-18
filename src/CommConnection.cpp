@@ -45,9 +45,9 @@ void CommConnection::performReads() {
 	while(!interruptRead) {
 		bytesRead = getData(buff, _MAX_DATA_LENGTH);
 		if (bytesRead > 0) {
-//			printReadInformation(bytesRead, buff);
+	//		printReadInformation(bytesRead, buff);
 			fillBuffer(buff, bytesRead);
-//			printBuffer(buffer);
+	//		printBuffer(buffer);
 			cvBool = true;
 			try {
 				cv.notify_one();
@@ -218,15 +218,16 @@ int CommConnection::readUntil(char **buff, const char &delim, const long long &m
                     (*buff)[0] = buffer[readIndex++];
                     (*buff)[1] = '\0';
                     return count;
-                } 
-                break;
+                } else {
+                    i++;
+                    break;
+                }
             } else {
                 if(i == readIndex) {
-                    *buff = NULL
+                    *buff = NULL;
                     return 0;
                 }
                 count--;
-                i--;
                 break;
             }
         } else {
@@ -272,7 +273,7 @@ void CommConnection::terminate() {
 		cvBool = true;
 		cv.notify_all();
 		closeThread();
-		//delete[] buffer;
+		delete[] buffer;
 		exitGracefully();
 	}
 }

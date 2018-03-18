@@ -1,6 +1,6 @@
 CXX				= g++
 LIBS			= -lpthread
-CXXFLAGS		= -Wall -O2 -std=c++11 -g
+CXXFLAGS		= -Wall -std=c++11 -g
 SRC_SUFFIX		= .cpp
 PRG_SUFFIX		= .bin
 TEST_SUFFIX		= .test
