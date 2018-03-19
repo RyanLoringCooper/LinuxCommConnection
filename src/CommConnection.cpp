@@ -177,6 +177,27 @@ int CommConnection::waitForData() {
 	return available();
 }
 
+int CommConnection::waitForDelimitor(const char &delim) {
+	int numBytesToRead = 0;
+	while(true) {
+		std::unique_lock<std::mutex> lk(dataMutex);
+		cv.wait(lk, [this]{
+			if(this->cvBool) {
+				this->cvBool = false;
+				return true;
+			} else {
+				return false;
+			}
+		});
+		for(int i = 0; i < available(); i++) {
+			if(buffer[(i+readIndex)%_BUFFER_SIZE] == delim) {
+				return i+numBytesToRead;
+			}
+		}
+		numBytesToRead += i;
+	}
+}
+
 char CommConnection::read() {
 	if(available() > 0) {
 		if (readIndex + 1 < _BUFFER_SIZE) {
