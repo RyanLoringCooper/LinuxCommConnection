@@ -98,7 +98,7 @@ char *CommConnection::readRange(const int &start, const int &end) {
         memcpy(retval, &buffer[start], end-start);
         retval[end-start] = '\0';
     }
-    readIndex = end+1;
+    readIndex = end;
     return retval;
 }
 
@@ -180,17 +180,9 @@ int CommConnection::waitForData() {
 int CommConnection::waitForDelimitor(const char &delim) {
 	int numBytesToRead = 0;
 	while(true) {
-		std::unique_lock<std::mutex> lk(dataMutex);
-		cv.wait(lk, [this]{
-			if(this->cvBool) {
-				this->cvBool = false;
-				return true;
-			} else {
-				return false;
-			}
-		});
+		int avail = waitForData();
 		int i;
-		for(i = 0; i < available(); i++) {
+		for(i = 0; i < avail; i++) {
 			if(buffer[(i+numBytesToRead+readIndex)%_BUFFER_SIZE] == delim) {
 				return i+numBytesToRead+1;
 			}
@@ -215,21 +207,13 @@ char CommConnection::read() {
 
 void CommConnection::read(char *buff, const long long &bytesToRead) {
 	if(bytesToRead <= available()) {
-		int newReadIndex = readIndex+bytesToRead;
-		char *temp = readRange(readIndex, newReadIndex);
+		int end = readIndex+bytesToRead;
+		if(end > _BUFFER_SIZE) {
+			end -= _BUFFER_SIZE;
+		}
+		char *temp = readRange(readIndex, end);
 		memcpy(buff, temp, bytesToRead+1);
 		delete[] temp;
-/*		if(newReadIndex < _BUFFER_SIZE) {
-			memcpy(buff, &buffer[readIndex], bytesToRead);
-			readIndex = newReadIndex;
-		} else {
-			int overflow = newReadIndex-_BUFFER_SIZE;
-			int underflow = _BUFFER_SIZE-readIndex;
-			memcpy(buff, &buffer[readIndex], underflow);
-			memcpy(&buff[underflow], buffer, overflow);
-			readIndex = overflow;
-		}
-*/
 	}
 }
 

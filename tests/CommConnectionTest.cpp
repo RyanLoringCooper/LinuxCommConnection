@@ -72,16 +72,16 @@ int main(int argc, char *argv[]) {
     fc.waitForData();
     char *buff;
     int read = fc.readUntil(&buff, '}', 0, true);
-    std::cout << "***\nread: " << read << " buff: " << buff << std::endl;
+    std::cout << "***\nread: " << read << " buff: " << buff << " next: " << fc.read() << std::endl;
     delete[] buff;
     buff = NULL;
 
-    std::cout << "***Testing readUntil\n";
+    std::cout << "***Testing readUntil with false\n";
     fseek(fc.fp, 0, SEEK_SET);
     fc._readEOF = false;
     fc.waitForData();
     read = fc.readUntil(&buff, '}', 0, false);
-    std::cout << "***\nread: " << read << " buff: " << buff << std::endl;
+    std::cout << "***\nread: " << read << " buff: " << buff << " next:" << fc.read() << std::endl;
     buff = NULL;
 
     std::cout << "*** Testing wrap around if _BUFFER_SIZE == 128\n";
