@@ -217,7 +217,7 @@ void CommConnection::read(char *buff, const long long &bytesToRead) {
 	if(bytesToRead <= available()) {
 		int newReadIndex = readIndex+bytesToRead;
 		char *temp = readRange(readIndex, newReadIndex);
-		memcpy(buff, temp, bytesToRead);\
+		memcpy(buff, temp, bytesToRead+1);
 		delete[] temp;
 /*		if(newReadIndex < _BUFFER_SIZE) {
 			memcpy(buff, &buffer[readIndex], bytesToRead);
