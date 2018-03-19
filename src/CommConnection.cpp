@@ -191,7 +191,7 @@ int CommConnection::waitForDelimitor(const char &delim) {
 		});
 		int i;
 		for(i = 0; i < available(); i++) {
-			if(buffer[(i+readIndex)%_BUFFER_SIZE] == delim) {
+			if(buffer[(i+numBytesToRead+readIndex)%_BUFFER_SIZE] == delim) {
 				return i+numBytesToRead+1;
 			}
 		}
