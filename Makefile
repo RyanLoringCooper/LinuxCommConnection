@@ -46,6 +46,7 @@ archive: $(SRC_OBJS) copyHeaders
 copyHeaders:
 	@mkdir -p $(BUILD_DIR)/$(LIB_TARGET)/include/$(LIB_TARGET)
 	@cp $(HEADERS) $(BUILD_DIR)/$(LIB_TARGET)/include/$(LIB_TARGET)/
+	@cp LICENSE.txt $(BUILD_DIR)/$(LIB_TARGET)
 
 .PHONY: tests
 tests: $(TEST_BINS)
