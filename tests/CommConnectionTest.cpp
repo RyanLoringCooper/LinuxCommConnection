@@ -76,22 +76,41 @@ int main(int argc, char *argv[]) {
     delete[] buff;
     buff = NULL;
 
+    std::cout << "***Testing readUntil\n";
     fseek(fc.fp, 0, SEEK_SET);
     fc._readEOF = false;
     fc.waitForData();
     read = fc.readUntil(&buff, '}', 0, false);
     std::cout << "***\nread: " << read << " buff: " << buff << std::endl;
-    delete[] buff;
     buff = NULL;
 
-    //So much more data. So much more data. So much more data. So much more data. So much more data. So much \n
+    std::cout << "*** Testing wrap around if _BUFFER_SIZE == 128\n";
     fc.write(std::string("So much more data. So much \n"));
     fseek(fc.fp, 0, SEEK_SET);
     fc._readEOF = false;
     int avail = fc.waitForData();
+    delete[] buff;
     buff = new char[avail+1];
     fc.read(buff, avail);
     std::cout << "buff: " << buff << std::endl;
+
+    std::cout << "*** TESTING readString and waitForDelimitor\n";
+    fc.clearBuffer();
+    fseek(fc.fp, 0, SEEK_SET);
+    fc._readEOF = false;
+    int bytesToRead = fc.waitForDelimitor('}');
+    std::string readstr = fc.readString(bytesToRead);
+    std::cout << "bytesToRead: " << bytesToRead << "readstr: " << readstr << std::endl;
+
+    std::cout << "*** TESTING and waitForDelimitor\n";
+    fc.clearBuffer();
+    fseek(fc.fp, 0, SEEK_SET);
+    fc._readEOF = false;
+    bytesToRead = fc.waitForDelimitor('}');
+    delete[] buff;
+    buff = new char[bytesToRead+1];
+    fc.read(buff, bytesToRead);
+    std::cout << "bytesToRead: " << bytesToRead << " strlen(buff): " << strlen(buff) << " buff: " << buff << std::endl;
     delete[] buff;
     return 0;
 }

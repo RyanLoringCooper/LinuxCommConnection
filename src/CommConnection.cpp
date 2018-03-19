@@ -189,9 +189,10 @@ int CommConnection::waitForDelimitor(const char &delim) {
 				return false;
 			}
 		});
-		for(int i = 0; i < available(); i++) {
+		int i;
+		for(i = 0; i < available(); i++) {
 			if(buffer[(i+readIndex)%_BUFFER_SIZE] == delim) {
-				return i+numBytesToRead;
+				return i+numBytesToRead+1;
 			}
 		}
 		numBytesToRead += i;
@@ -215,7 +216,10 @@ char CommConnection::read() {
 void CommConnection::read(char *buff, const long long &bytesToRead) {
 	if(bytesToRead <= available()) {
 		int newReadIndex = readIndex+bytesToRead;
-		if(newReadIndex < _BUFFER_SIZE) {
+		char *temp = readRange(readIndex, newReadIndex);
+		memcpy(buff, temp, bytesToRead);\
+		delete[] temp;
+/*		if(newReadIndex < _BUFFER_SIZE) {
 			memcpy(buff, &buffer[readIndex], bytesToRead);
 			readIndex = newReadIndex;
 		} else {
@@ -225,6 +229,7 @@ void CommConnection::read(char *buff, const long long &bytesToRead) {
 			memcpy(&buff[underflow], buffer, overflow);
 			readIndex = overflow;
 		}
+*/
 	}
 }
 
