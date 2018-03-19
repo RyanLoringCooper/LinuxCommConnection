@@ -139,6 +139,13 @@ class CommConnection {
          */
         int waitForData();
 
+    	/* blocks until the delimiter is found
+         * @param delim
+         * 		the character to wait for the connection to send
+         * @retval the number of bytes to be read until the delimitor is found
+         */
+        int waitForDelimitor(const char &delim);
+
         /* returns 1 byte from the buffer if one is available and moves readIndex up by 1
          * if no byte is available, then it returns 0
          * @retval the byte read from buffer, or 0 if no byte is available
