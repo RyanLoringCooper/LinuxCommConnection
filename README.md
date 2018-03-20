@@ -21,7 +21,7 @@ while(keepReading) {
 }
 ```
 
-The header to include the library if it is installed is:
+The headers to include the library, if it is installed is:
 ``` 
 #include <LinuxCommConnection/SerialConnection.h>
 ```
@@ -30,7 +30,7 @@ The library can be installed to /usr/include and /usr/lib with
 ```  
 make install
 ```
-and unstalled with
+and unistalled with
 ```
 make uninstall
 ```
