@@ -20,3 +20,18 @@ while(keepReading) {
     con.write(std::string("Something you would like to send"));
 }
 ```
+
+The header to include the library if it is installed is:
+``` 
+#include <LinuxCommConnection/SerialConnection.h>
+```
+
+The library can be installed to /usr/include and /usr/lib with 
+```  
+make install
+```
+and unstalled with
+```
+make uninstall
+```
+It can be linked against with -lLinuxCommConnection
