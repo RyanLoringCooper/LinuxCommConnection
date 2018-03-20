@@ -1,4 +1,4 @@
-CXX				= g++
+CXX			= g++
 LIBS			= -lpthread
 CXXFLAGS		= -Wall -std=c++11 -g
 SRC_SUFFIX		= .cpp
@@ -44,18 +44,29 @@ archive: $(SRC_OBJS) copyHeaders
 
 .PHONY: copyHeaders
 copyHeaders:
-	@mkdir -p $(BUILD_DIR)/$(LIB_TARGET)/include/$(LIB_TARGET)
-	@cp $(HEADERS) $(BUILD_DIR)/$(LIB_TARGET)/include/$(LIB_TARGET)/
-	@cp LICENSE.txt $(BUILD_DIR)/$(LIB_TARGET)
+	@mkdir -p $(BUILD_DIR)$(LIB_TARGET)/include/$(LIB_TARGET)
+	@cp $(HEADERS) $(BUILD_DIR)$(LIB_TARGET)/include/$(LIB_TARGET)/
+	@cp LICENSE.txt $(BUILD_DIR)$(LIB_TARGET)
 
 .PHONY: tests
 tests: $(TEST_BINS)
 	@echo Compiled tests
 
+.PHONY: install
+install: lib
+	mv $(BUILD_DIR)$(LIB_TARGET)/include/$(LIB_TARGET) /usr/include
+	mv $(BUILD_DIR)$(LIB_TARGET)/lib/lib$(LIB_TARGET).so /usr/lib
+
+.PHONY: uninstall
+uninstall: 
+	rm -rf /usr/include/$(LIB_TARGET)
+	rm -rf /usr/lib/lib$(LIB_TARGET).so
+
 %$(TEST_SUFFIX): $(TEST_OBJS) $(SRC_OBJS) 
 	@mkdir -p $(BUILD_DIR)
 	$(CXX) $(CXXFLAGS) -o $(BUILD_DIR)$(BIN:$(TEST_SUFFIX)=) $(patsubst %.o, $(OBJ_DIR)%.o, $(patsubst %$(TEST_SUFFIX), %.o, $@)) $(patsubst %.o, $(OBJ_DIR)%.o, $(SRC_OBJS)) $(LIBS)
 
+.PHONY: clean
 clean:
 	$(RM) -rf $(BUILD_DIR)
 	$(RM) -rf $(OBJ_DIR)
