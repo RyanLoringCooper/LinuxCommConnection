@@ -8,6 +8,7 @@
 // protected:
 void SerialConnection::failedRead() {
     printf("Failed to read from socket with error: %d", GetLastError());
+    connected = false;
 }
 
 int SerialConnection::getData(char *buff, const int &buffSize) {
