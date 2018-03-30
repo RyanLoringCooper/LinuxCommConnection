@@ -8,6 +8,7 @@
 // protected:
 void SerialConnection::failedRead() {
 	fprintf(stderr, "Failed to read from serial port with error: %d\n", errno);
+	connected = false;
 }
 
 int SerialConnection::getData(char *buff, const int &buffSize) {
