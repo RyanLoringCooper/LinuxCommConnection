@@ -89,9 +89,9 @@ bool NetworkConnection::connectToServer() {
 }
 
 void NetworkConnection::failedRead() {
-	//if(debug) {
+	if(debug) {
 		printf("Failed to read from socket. errno = %d\n", errno);
-	//}
+	}
 	connected = false;
 	if(connectionType == SOCK_STREAM) {
 		if(server && clientSocket > 0) {
@@ -106,10 +106,8 @@ void NetworkConnection::failedRead() {
 int NetworkConnection::getData(char *buff, const int &buffSize) {
 	if(connected && !interruptRead) {
 		if(server) {
-            printf("clientSocket > 0\n");
 			return recv(clientSocket, buff, buffSize, 0);
 		} else {
-            printf("clientSocket < 0\n");
 			socklen_t len = sizeof(rAddr);
 			return recvfrom(mSocket, buff, buffSize, 0, (struct sockaddr *)&rAddr, &len);
 		}
