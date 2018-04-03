@@ -4,6 +4,7 @@
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 #include "../NetworkConnection.h"
+#include <errno.h>
 
 // protected
 bool NetworkConnection::setupServer(const int &port) {
@@ -88,12 +89,12 @@ bool NetworkConnection::connectToServer() {
 }
 
 void NetworkConnection::failedRead() {
-	if(debug) {
-		printf("Failed to read from socket.\n");
-	}
+	//if(debug) {
+		printf("Failed to read from socket. errno = %d\n", errno);
+	//}
 	connected = false;
 	if(connectionType == SOCK_STREAM) {
-		if(clientSocket > 0) {
+		if(server && clientSocket > 0) {
 			close(clientSocket);
 			waitForClientConnection();
 		} else {
@@ -104,9 +105,11 @@ void NetworkConnection::failedRead() {
 
 int NetworkConnection::getData(char *buff, const int &buffSize) {
 	if(connected && !interruptRead) {
-		if(clientSocket > 0) {
+		if(server) {
+            printf("clientSocket > 0\n");
 			return recv(clientSocket, buff, buffSize, 0);
 		} else {
+            printf("clientSocket < 0\n");
 			socklen_t len = sizeof(rAddr);
 			return recvfrom(mSocket, buff, buffSize, 0, (struct sockaddr *)&rAddr, &len);
 		}
