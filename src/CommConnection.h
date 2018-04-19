@@ -14,11 +14,16 @@
 #include <mutex>
 #include <condition_variable>
 
-// size of the buffer that is filled when a read is preformed
-#define _MAX_DATA_LENGTH 4096
-// size of the circular buffer that the user is served data from
-// 4194304 = 2^22 = 4MB
-#define _BUFFER_SIZE 4194304
+#ifndef _MAX_DATA_LENGTH
+    // size of the buffer that is filled when a read is preformed
+    #define _MAX_DATA_LENGTH 4096
+#endif
+
+#ifndef _BUFFER_SIZE
+    // size of the circular buffer that the user is served data from
+    // 4194304 = 2^22 = 4MB
+    #define _BUFFER_SIZE 4194304
+#endif
 
 class CommConnection {
     protected:
