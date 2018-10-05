@@ -1,8 +1,3 @@
-/* Copyright 2018 Ryan Cooper (RyanLoringCooper@gmail.com)
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
 #pragma once
 #ifndef COMMCONNECTION_H
 #define COMMCONNECTION_H
@@ -14,16 +9,11 @@
 #include <mutex>
 #include <condition_variable>
 
-#ifndef _MAX_DATA_LENGTH
-    // size of the buffer that is filled when a read is preformed
-    #define _MAX_DATA_LENGTH 4096
-#endif
-
-#ifndef _BUFFER_SIZE
-    // size of the circular buffer that the user is served data from
-    // 4194304 = 2^22 = 4MB
-    #define _BUFFER_SIZE 4194304
-#endif
+// size of the buffer that is filled when a read is preformed
+#define _MAX_DATA_LENGTH 4096
+// size of the circular buffer that the user is served data from
+// 4194304 = 2^22 = 4MB
+#define _BUFFER_SIZE 4194304
 
 class CommConnection {
 protected:
@@ -81,7 +71,7 @@ public:
     // starts the readThread
 	bool begin();
 	// returns how many bytes are available to be read from the buffer immediately
-	long long int available() const;
+	unsigned int available() const;
 	// blocks until there is a byte to be read from the buffer
 	unsigned int waitForData();
 	// returns 1 byte from the buffer if one is available and moves readIndex up by 1
