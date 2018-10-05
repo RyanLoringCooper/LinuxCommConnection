@@ -1,31 +1,5 @@
-/* Copyright 2018 Ryan Cooper (RyanLoringCooper@gmail.com)
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
-
 #include "CommConnection.h"
 #include <cstdio>
-
-void printReadInformation(const int &bytesRead, const char *buff) {
-	fprintf(stderr, "bytesRead:%d ", bytesRead);
-	for(int i = 0 ; i < bytesRead; i++) {
-		fprintf(stderr, "%c", buff[i]);
-	}
-	fprintf(stderr, "\n");
-}
-
-void printBuffer(const char *buffer) {
-	fprintf(stderr, "buffer:");
-	for(int i = 0; i < _BUFFER_SIZE; i++) {
-		if(buffer[i] < 32 || buffer[i] > 126) {
-			fprintf(stderr, "%02x", buffer[i]);
-		} else {
-			fprintf(stderr, "%c", buffer[i]);
-		}
-	}
-	fprintf(stderr, "\n");
-}
 
 void CommConnection::performReads() {
 	char buff[_MAX_DATA_LENGTH];
@@ -33,21 +7,15 @@ void CommConnection::performReads() {
 	int bytesRead;
 	while(!interruptRead) {
 		bytesRead = getData(buff, _MAX_DATA_LENGTH);
-		if (bytesRead > 0) {
-	//		printReadInformation(bytesRead, buff);
-			fillBuffer(buff, bytesRead);
-	//		printBuffer(buffer);
-			cvBool = true;
-			try {
-				cv.notify_one();
-			} catch (...) {
-				fprintf(stderr, "cv.notify_one() mutex lock failed\n");
-			}
-		} else if(bytesRead < 0 && blockingTime < 0) {
+ 	    if (bytesRead > 0) {
+	        fillBuffer(buff, bytesRead);
+	        cvBool = true;
+	        cv.notify_one();
+	    } else if(bytesRead < 0 && blockingTime < 0) {
 			failedRead();
 		} else if(blockingTime > 0) {
-			std::this_thread::sleep_for(std::chrono::milliseconds(blockingTime));
-		}
+            std::this_thread::sleep_for(std::chrono::milliseconds(blockingTime));
+        }
 	}
 }
 
@@ -57,7 +25,6 @@ void CommConnection::fillBuffer(char *buff, const int &bytesRead) {
 		memcpy(&buffer[writeIndex], buff, bytesRead);
 		writeIndex = newWriteIndex;
 	} else {
-		fprintf(stderr, "Handling wrap around\n");
 		int overflow = newWriteIndex-_BUFFER_SIZE;
 		int underflow = _BUFFER_SIZE-writeIndex;
 		memcpy(&buffer[writeIndex], buff, underflow);
@@ -75,25 +42,9 @@ void CommConnection::closeThread() {
 	}
 }
 
-char *CommConnection::readRange(const int &start, const int &end) {
-    char *retval;
-    if(end < start) {
-        retval = new char[end+_BUFFER_SIZE-start+1];
-        memcpy(retval, &buffer[start], _BUFFER_SIZE-start);
-        memcpy(&retval[_BUFFER_SIZE-start], &buffer[0], end);
-        retval[end+_BUFFER_SIZE-start] = '\0';
-    } else {
-        retval = new char[end-start+1];
-        memcpy(retval, &buffer[start], end-start);
-        retval[end-start] = '\0';
-    }
-    readIndex = end;
-    return retval;
-}
-
 CommConnection::CommConnection(const int &blockingTime, const bool &debug, const bool &noReads) {
-	this->blockingTime = blockingTime;
-	this->debug = debug;
+    this->blockingTime = blockingTime;
+    this->debug = debug;
 	this->noReads = noReads;
 	connected = false;
 	interruptRead = false;
@@ -106,32 +57,32 @@ CommConnection::CommConnection(const int &blockingTime, const bool &debug, const
 }
 
 CommConnection::CommConnection(const CommConnection &other) {
-	if(this == &other) {
-		return;
-	}
-	*this = other;
+    if(this == &other) {
+        return;
+    }
+    *this = other;
 }
 
 CommConnection &CommConnection::operator=(const CommConnection &other) {
-	if(this == &other) {
-		return *this;
-	}
-	buffer = new char[_BUFFER_SIZE+1];
-	memcpy(buffer, other.buffer, _BUFFER_SIZE+1);
-	readIndex = other.readIndex;
-	writeIndex = other.writeIndex;
-	blockingTime = other.blockingTime;
-	connected = other.connected;
-	interruptRead = other.interruptRead;
-	noReads = other.noReads;
-	begun = other.begun;
-	terminated = other.terminated;
-	cvBool = other.cvBool;
-	debug = other.debug;
-	if(begun && connected) {
-		begin();
-	}
-	return *this;
+    if(this == &other) {
+        return *this;
+    }
+    buffer = new char[_BUFFER_SIZE+1];
+    memcpy(buffer, other.buffer, _BUFFER_SIZE+1);
+    readIndex = other.readIndex;
+    writeIndex = other.writeIndex;
+    blockingTime = other.blockingTime;
+    connected = other.connected;
+    interruptRead = other.interruptRead;
+    noReads = other.noReads;
+    begun = other.begun;
+    terminated = other.terminated;
+    cvBool = other.cvBool;
+    debug = other.debug;
+    if(begun && connected) {
+        begin();
+    }
+    return *this;
 }
 
 bool CommConnection::begin() {
@@ -146,38 +97,24 @@ bool CommConnection::begin() {
 	}
 }
 
-long long CommConnection::available() const {
-	long long retval = writeIndex-readIndex;
+unsigned int CommConnection::available() const {
+	unsigned int retval = writeIndex-readIndex;
 	if(retval < 0) 
 		retval = writeIndex+_BUFFER_SIZE-readIndex;
 	return retval;
 }
 
-int CommConnection::waitForData() {
+unsigned int CommConnection::waitForData() {
 	std::unique_lock<std::mutex> lk(dataMutex);
 	cv.wait(lk, [this]{
-			if(this->cvBool) {
-			this->cvBool = false;
-			return true;
-			} else {
-			return false;
-			}
-			});
+        if(this->cvBool) {
+            this->cvBool = false;
+            return true;
+        } else {
+            return false;
+        }
+    });
 	return available();
-}
-
-int CommConnection::waitForDelimitor(const char &delim) {
-	int numBytesToRead = 0;
-	while(true) {
-		int avail = waitForData();
-		int i;
-		for(i = 0; i < avail; i++) {
-			if(buffer[(i+numBytesToRead+readIndex)%_BUFFER_SIZE] == delim) {
-				return i+numBytesToRead+1;
-			}
-		}
-		numBytesToRead += i;
-	}
 }
 
 char CommConnection::read() {
@@ -194,65 +131,57 @@ char CommConnection::read() {
 	}
 }
 
-void CommConnection::read(char *buff, const long long &bytesToRead) {
+void CommConnection::read(char *buff, const unsigned int &bytesToRead) {
 	if(bytesToRead <= available()) {
-		int end = readIndex+bytesToRead;
-		if(end > _BUFFER_SIZE) {
-			end -= _BUFFER_SIZE;
+		int newReadIndex = readIndex+bytesToRead;
+		if(newReadIndex < _BUFFER_SIZE) {
+			memcpy(buff, &buffer[readIndex], bytesToRead);
+			readIndex = newReadIndex;
+		} else {
+			int overflow = newReadIndex-_BUFFER_SIZE;
+			int underflow = _BUFFER_SIZE-readIndex;
+			memcpy(buff, &buffer[readIndex], underflow);
+			memcpy(&buff[underflow], buffer, overflow);
+			readIndex = overflow;
 		}
-		char *temp = readRange(readIndex, end);
-		memcpy(buff, temp, bytesToRead+1);
-		delete[] temp;
 	}
 }
 
-int CommConnection::readUntil(char **buff, const char &delim, const long long &maxBytes, const bool &includeDelim) {
-	int i = readIndex, count = 0;
+// does not put the delim character in the buff 
+int CommConnection::readUntil(char *buff, const int &buffSize, const char &delim) { // TODO this needs work! Can't handle wrap around case
+	int i = readIndex, count = 0, leftOff = 0;
 	while(true) {
-        count++;
-        if(buffer[i] == delim) {
-            if(includeDelim) {
-                if(i == readIndex) {
-                    *buff = new char[2];
-                    (*buff)[0] = buffer[readIndex++];
-                    (*buff)[1] = '\0';
-                    return count;
-                } else {
-                    i++;
-                    break;
-                }
-            } else {
-                if(i == readIndex) {
-                    *buff = NULL;
-                    return 0;
-                }
-                count--;
-                break;
-            }
-        } else {
-            if((maxBytes > 0 && count == maxBytes) || i == writeIndex-1) {
-                break;
-            }
-            i++;
-            if(i == _BUFFER_SIZE) {
-                i = 0;
-            }
-        }
-    }
-    *buff = readRange(readIndex, i);
-    return count;
+		if(available() > 0) {
+			if(buffer[i] == delim) {
+				memcpy(&buff[leftOff], &buffer[readIndex], i-readIndex);
+				readIndex = i+1;
+				return count;
+			} else if(i == _BUFFER_SIZE) {
+				memcpy(&buff[leftOff], &buffer[readIndex], i-readIndex);
+				leftOff = i-readIndex;
+				readIndex = 0;
+				i = 0;
+			} else {
+				i++;
+			}
+			count++;
+			if(count == buffSize) {
+				return count;
+			}
+		}
+	}
 }
 
-std::string CommConnection::readString(const long long &bytesToRead) {
-	long long goingToRead = bytesToRead;
-	if(goingToRead == 0) {
-		goingToRead = available();
-	}
+std::string CommConnection::readString(const unsigned int &bytesToRead) {
+    unsigned int goingToRead = bytesToRead;
+    if(goingToRead < 0) {
+        goingToRead = available();
+    }
 	if(goingToRead <= available()) {
-		char buff[goingToRead+1];
-		memset(buff, 0, goingToRead+1);
-		read(buff, goingToRead);
-		return std::string(buff);
+	    char buff[goingToRead];
+	    memset(buff, 0, goingToRead);
+	    read(buff, goingToRead);
+	    return std::string(buff);
 	} else {
 		return std::string("");
 	}
@@ -269,18 +198,18 @@ void CommConnection::clearBuffer() {
 void CommConnection::terminate() {
 	if(!terminated) {
 		terminated = true;
-		cvBool = true;
-		cv.notify_all();
+        cvBool = true;
+        cv.notify_all();
 		closeThread();
-		delete[] buffer;
+		//delete[] buffer;
 		exitGracefully();
 	}
 }
 
 bool CommConnection::write(const std::string &buff) {
-	return write(buff.c_str(), buff.length());
+    return write(buff.c_str(), buff.length());
 } 
 
 CommConnection::~CommConnection() {
-	terminate();
+    terminate();
 }
