@@ -1,4 +1,10 @@
+/* Copyright 2018 Ryan Cooper (RyanLoringCooper@gmail.com)
+* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
 #include "../NetworkConnection.h"
+#include <errno.h>
 
 // protected
 bool NetworkConnection::setupServer(const int &port) {
@@ -30,7 +36,7 @@ bool NetworkConnection::waitForClientConnection() {
 	listen(mSocket,5);
 	printf("Waiting for client connection...\n");
 	// accept a client socket
-	while(interruptRead) {
+	while(!interruptRead) {
 		clientSocket = accept(mSocket, (struct sockaddr *) NULL, NULL);
 		if(errno != EWOULDBLOCK && errno != EAGAIN) {
 			if (clientSocket < 0) {
@@ -84,11 +90,11 @@ bool NetworkConnection::connectToServer() {
 
 void NetworkConnection::failedRead() {
 	if(debug) {
-		printf("Failed to read from socket.\n");
+		printf("Failed to read from socket. errno = %d\n", errno);
 	}
 	connected = false;
 	if(connectionType == SOCK_STREAM) {
-		if(clientSocket > 0) {
+		if(server && clientSocket > 0) {
 			close(clientSocket);
 			waitForClientConnection();
 		} else {
@@ -99,7 +105,7 @@ void NetworkConnection::failedRead() {
 
 int NetworkConnection::getData(char *buff, const int &buffSize) {
 	if(connected && !interruptRead) {
-		if(clientSocket > 0) {
+		if(server) {
 			return recv(clientSocket, buff, buffSize, 0);
 		} else {
 			socklen_t len = sizeof(rAddr);
