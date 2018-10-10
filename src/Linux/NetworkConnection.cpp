@@ -17,7 +17,6 @@ bool NetworkConnection::setupServer(const int &port) {
 		fprintf(stderr, "ERROR opening socket: %d\n", errno);
 		return false;
 	}
-	setBlocking(blockingTime);
 	if(bind(mSocket, (struct sockaddr *) &mAddr, sizeof(mAddr)) < 0) {
 		fprintf(stderr, "ERROR on binding to port %d. Is it already taken?\n", port);
 		return false;
@@ -51,7 +50,10 @@ bool NetworkConnection::waitForClientConnection() {
 				connected = true;
 				return true;
 			}
-		}
+		} else {
+            printf("accepting again\n");
+            std::this_thread::sleep_for(std::chrono::milliseconds(blockingTime));
+        }
 	}
 	return false;
 }
@@ -68,7 +70,6 @@ bool NetworkConnection::setupClient(const char *ipaddr, const int &port) {
 		fprintf(stderr, "ERROR opening socket: %d\n", errno);
 		return false;
 	}
-	setBlocking(blockingTime);
 	if(connectionType == SOCK_STREAM) {
 		return connectToServer();
 	} else {
@@ -105,7 +106,7 @@ void NetworkConnection::failedRead() {
 
 int NetworkConnection::getData(char *buff, const int &buffSize) {
 	if(connected && !interruptRead) {
-		if(server) {
+		if(connectionType == SOCK_STREAM) {
 			return recv(clientSocket, buff, buffSize, 0);
 		} else {
 			socklen_t len = sizeof(rAddr);
@@ -171,5 +172,9 @@ bool NetworkConnection::write(const char *buff, const int &buffSize) {
 		socket = &mSocket;
 		addr = &mAddr;
 	}
-	return sendto(*socket, buff, buffSize, 0, (sockaddr *) addr, (socklen_t) sizeof(*addr)) >= 0;
+    if(connectionType == SOCK_STREAM) {
+        return send(*socket, buff, buffSize,0);
+    } else {
+    	return sendto(*socket, buff, buffSize, 0, (sockaddr *) addr, (socklen_t) sizeof(*addr)) >= 0;
+    }
 }
