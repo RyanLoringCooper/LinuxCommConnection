@@ -51,7 +51,6 @@ bool NetworkConnection::waitForClientConnection() {
 				return true;
 			}
 		} else {
-            printf("accepting again\n");
             std::this_thread::sleep_for(std::chrono::milliseconds(blockingTime));
         }
 	}
@@ -107,7 +106,11 @@ void NetworkConnection::failedRead() {
 int NetworkConnection::getData(char *buff, const int &buffSize) {
 	if(connected && !interruptRead) {
 		if(connectionType == SOCK_STREAM) {
-			return recv(clientSocket, buff, buffSize, 0);
+            if(server) {
+			    return recv(clientSocket, buff, buffSize, 0);
+            } else {
+			    return recv(mSocket, buff, buffSize, 0);
+            }
 		} else {
 			socklen_t len = sizeof(rAddr);
 			return recvfrom(mSocket, buff, buffSize, 0, (struct sockaddr *)&rAddr, &len);

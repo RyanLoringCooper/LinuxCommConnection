@@ -22,7 +22,7 @@ VPATH			= tests src src/impls obj
 BIN = $@
 
 .PHONY: all
-all: tests | lib archive 
+all: lib archive 
 
 .PHONY: lib
 lib: $(SRC_OBJS) copyHeaders
