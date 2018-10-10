@@ -165,18 +165,15 @@ bool NetworkConnection::write(const char *buff, const int &buffSize) {
 		return false;
 	int *socket;
 	sockaddr_in *addr;
-	if(clientSocket > 0) {
+	if(server) {
 		socket = &clientSocket;
-		addr = &rAddr;
-	} else if(server) {
-		socket = &mSocket;
 		addr = &rAddr;
 	} else {
 		socket = &mSocket;
 		addr = &mAddr;
 	}
     if(connectionType == SOCK_STREAM) {
-        return send(*socket, buff, buffSize,0);
+        return send(*socket, buff, buffSize, 0);
     } else {
     	return sendto(*socket, buff, buffSize, 0, (sockaddr *) addr, (socklen_t) sizeof(*addr)) >= 0;
     }
